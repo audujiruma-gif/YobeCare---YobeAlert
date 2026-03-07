@@ -7,15 +7,16 @@
 ## 🔗 Live Demos
 | Project | Live Link |
 |---|---|
-| 🛡️ YobeAlert | https://yobealert-ng.netlify.app |
-| 🏥 YobeCare | Coming soon on Netlify |
+| 🛡️ YobeAlert | https:/ https://yobealert.netlify.app/ |
+| 🏥 YobeCare
+|https://yobecare.netlify.app/|
 
 ---
 
 ## 👤 Builder
-**Gabriel Audu Kaku**
+**Kaku Jiruma Gabriel**
 - GitHub: audujiruma-gif
-- Email: audujiruma@gmail.com
+- Email: kakugabriel53@gmail.com
 - State: Yobe State, Nigeria
 - Track: 3MTT NextGen (Airtel)
 
