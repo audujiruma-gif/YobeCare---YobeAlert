@@ -22,7 +22,7 @@
 ---
 
 ## 🎯 Challenge Pillar
-**Digital Inclusion + Health Access**
+**Digital / Enviroment Inclusion + Health Access + Security Reort**
 
 ---
 
