@@ -7,7 +7,7 @@
 ## 🔗 Live Demos
 | Project | Live Link |
 |---|---|
-| 🛡️ YobeAlert | https:/ https://yobealert.netlify.app/ |
+| 🛡️ YobeAlert |https://yobealert.netlify.app/ |
 | 🏥 YobeCare
 |https://yobecare.netlify.app/|
 
