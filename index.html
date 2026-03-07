@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YobeCare (Airtel NextGen)</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal: #0D7B6B;
+  --teal2: #0a6459;
+  --teal-light: #14a891;
+  --teal-bg: #E8F5F3;
+  --purple: #7C3AED;
+  --purple2: #6D28D9;
+  --purple-light: #A855F7;
+  --purple-bg: #F5F0FF;
+  --red: #DC2626;
+  --red-bg: #FEF2F2;
+  --gold: #D97706;
+  --gold-bg: #FFFBEB;
+  --green: #16A34A;
+  --navy: #0D1B2A;
+  --dark: #1A2332;
+  --card: #1E2D3E;
+  --body: #F0F4F8;
+  --white: #ffffff;
+  --text: #1A2332;
+  --muted: #64748B;
+  --border: #E2E8F0;
+  --r: 16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--body);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden;}
+
+/* SCREENS */
+.screen{display:none !important;flex-direction:column;min-height:100vh;animation:fadeIn .35s ease;}
+.screen.active{display:flex !important;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* STATUS BAR */
+.status-bar{background:var(--navy);color:#fff;padding:8px 16px;display:flex;justify-content:space-between;font-size:12px;font-weight:600;}
+
+/* TOP BAR */
+.topbar{padding:16px 20px 12px;display:flex;align-items:center;gap:12px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.topbar .back{background:none;border:none;color:var(--teal);font-size:14px;font-weight:700;cursor:pointer;padding:0;}
+.topbar h2{font-size:18px;font-weight:800;flex:1;}
+.topbar .sub{font-size:12px;color:var(--muted);font-weight:400;}
+
+/* ═══ SCREENSHOT BLOCK ═══ */
+@media print { body { display: none !important; } }
+
+/* TTS floating reader bar */
+.tts-bar{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:var(--navy);border-radius:50px;padding:10px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 28px rgba(0,0,0,.35);z-index:999;transition:opacity .3s;opacity:0;pointer-events:none;max-width:360px;width:90%;}
+.tts-bar.visible{opacity:1;pointer-events:all;}
+.tts-orb{width:38px;height:38px;border-radius:50%;background:var(--teal);border:none;color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;}
+.tts-orb.speaking{background:var(--red);animation:ttsPulse .8s ease-in-out infinite alternate;}
+@keyframes ttsPulse{from{transform:scale(1)}to{transform:scale(1.12)}}
+.tts-info{flex:1;overflow:hidden;}
+.tts-info .tts-label{font-size:10px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
+.tts-info .tts-text{font-size:12px;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tts-lang-row{display:flex;gap:5px;}
+.tts-lang{background:rgba(255,255,255,.12);border:none;border-radius:20px;padding:5px 10px;font-size:10px;color:rgba(255,255,255,.7);cursor:pointer;font-family:'Sora',sans-serif;transition:all .2s;}
+.tts-lang.active{background:var(--teal);color:#fff;font-weight:700;}
+.tts-stop{background:rgba(255,255,255,.12);border:none;border-radius:50%;width:30px;height:30px;color:#fff;font-size:13px;cursor:pointer;flex-shrink:0;}
+.tts-lang-btn{background:var(--teal-bg);border:1.5px solid var(--teal);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer;font-family:'Sora',sans-serif;transition:all .2s;}
+.tts-lang-btn.active{background:var(--teal);color:#fff;}
+/* Read button on cards */
+.read-btn{display:inline-flex;align-items:center;gap:5px;background:var(--teal-bg);border:1.5px solid var(--teal);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer;font-family:'Sora',sans-serif;margin-top:8px;transition:all .2s;}
+.read-btn:hover{background:var(--teal);color:#fff;}
+.read-btn.speaking{background:var(--red);border-color:var(--red);color:#fff;}
+.bnav{display:flex;background:var(--white);border-top:1px solid var(--border);position:sticky;bottom:0;z-index:50;}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;cursor:pointer;color:var(--muted);font-size:9px;gap:3px;transition:color .2s;border:none;background:none;}
+.bni .icon{font-size:20px;}
+.bni.active{color:var(--teal);}
+.bni.active .icon{filter:drop-shadow(0 0 4px var(--teal));}
+
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.scroll::-webkit-scrollbar{width:3px;}
+.scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px;}
+
+/* ═══ SPLASH ═══ */
+#splash{background:linear-gradient(160deg,#0D7B6B 0%,#0a4a3f 50%,#0D1B2A 100%);align-items:center;justify-content:center;text-align:center;padding:40px 28px;}
+.splash-logo{width:100px;height:100px;border-radius:28px;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-size:48px;margin:0 auto 20px;border:2px solid rgba(255,255,255,.3);animation:logoIn 1s ease;}
+@keyframes logoIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.splash-title{font-size:40px;font-weight:800;color:#fff;letter-spacing:-1px;}
+.splash-title span{color:#5EEAD4;}
+.splash-tag{font-size:15px;color:rgba(255,255,255,.7);margin:10px 0 8px;font-weight:300;}
+.splash-state{display:inline-block;background:rgba(255,255,255,.15);color:#5EEAD4;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;margin-bottom:36px;}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:32px;width:100%;}
+.lbtn{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:14px;padding:14px 10px;color:#fff;cursor:pointer;transition:all .3s;text-align:center;}
+.lbtn.sel,.lbtn:hover{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.6);}
+.lbtn .lflag{font-size:26px;display:block;margin-bottom:6px;}
+.lbtn .lname{font-size:13px;font-weight:700;}
+.lbtn .lsub{font-size:10px;opacity:.7;margin-top:2px;}
+.btn-start{width:100%;padding:18px;border-radius:50px;background:linear-gradient(135deg,#14a891,#0D7B6B);color:#fff;font-size:17px;font-weight:800;border:none;cursor:pointer;box-shadow:0 8px 30px rgba(13,123,107,.5);letter-spacing:.5px;}
+.credits{margin-top:20px;font-size:11px;color:rgba(255,255,255,.4);}
+
+/* ═══ HOME ═══ */
+#home{background:#EEF2F7;}
+.home-head{background:linear-gradient(160deg,var(--teal) 0%,var(--teal2) 100%);padding:20px 20px 0;color:#fff;position:relative;}
+.home-head-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.home-head .greet{font-size:13px;opacity:.8;display:flex;align-items:center;gap:5px;}
+.home-head .uname{font-size:22px;font-weight:800;margin:3px 0 0;}
+.user-avatar{width:44px;height:44px;border-radius:50%;background:#E8630A;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;border:2px solid rgba(255,255,255,.4);flex-shrink:0;}
+.search-row{display:flex;gap:10px;align-items:center;margin-bottom:20px;}
+.search-box{flex:1;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);border-radius:50px;padding:12px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;backdrop-filter:blur(6px);}
+.search-box span{font-size:15px;}
+.search-box p{font-size:14px;color:rgba(255,255,255,.8);font-weight:400;}
+.mic-pill{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0;backdrop-filter:blur(6px);}
+.home-wave{width:100%;height:28px;display:block;margin-bottom:-2px;}
+.sec-title{padding:14px 20px 8px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+/* Quick access big cards */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;}
+.qa-card{border-radius:20px;padding:22px 18px 20px;cursor:pointer;transition:transform .2s;position:relative;overflow:hidden;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end;}
+.qa-card:active{transform:scale(.97);}
+.qa-card .qa-icon{font-size:32px;margin-bottom:10px;}
+.qa-card h4{font-size:16px;font-weight:800;color:#fff;margin-bottom:3px;}
+.qa-card p{font-size:12px;color:rgba(255,255,255,.8);}
+.qa-card.c-teal{background:linear-gradient(140deg,#0D7B6B,#0a5548);}
+.qa-card.c-orange{background:linear-gradient(140deg,#E8630A,#c4500a);}
+.qa-card.c-purple{background:linear-gradient(140deg,#7C3AED,#5b21b6);}
+.qa-card.c-dark{background:linear-gradient(140deg,#1a3a4a,#0d2233);}
+.qa-card.c-red{background:linear-gradient(140deg,#DC2626,#991b1b);grid-column:span 1;}
+/* Active alert strip */
+.active-alert-strip{margin:12px 16px 0;border-radius:14px;background:#fff;border:1.5px solid #FCA5A5;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.active-alert-strip .aa-dot{width:10px;height:10px;border-radius:50%;background:var(--red);animation:blink 1s infinite;flex-shrink:0;}
+.active-alert-strip h5{font-size:13px;font-weight:700;color:var(--red);}
+.active-alert-strip p{font-size:11px;color:var(--muted);margin-top:2px;}
+.active-alert-strip .aa-arr{margin-left:auto;color:var(--red);font-size:14px;}
+/* SOS */
+.sos-bar{margin:12px 16px 20px;border-radius:14px;background:var(--red);padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 4px 18px rgba(220,38,38,.3);}
+.sos-bar h4{color:#fff;font-size:15px;font-weight:800;}
+.sos-bar p{color:rgba(255,255,255,.8);font-size:11px;margin-top:2px;}
+
+/* ═══ SEARCH OVERLAY ═══ */
+.search-overlay{display:none;position:fixed;inset:0;z-index:200;flex-direction:column;background:var(--white);}
+.search-overlay.open{display:flex;animation:fadeIn .2s ease;}
+.so-head{background:linear-gradient(135deg,var(--teal),var(--teal2));padding:20px 16px 16px;}
+.so-input-row{display:flex;align-items:center;gap:10px;}
+.so-input{flex:1;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);border-radius:50px;padding:13px 18px;font-family:'Sora',sans-serif;font-size:15px;color:#fff;outline:none;}
+.so-input::placeholder{color:rgba(255,255,255,.65);}
+.so-cancel{background:none;border:none;color:rgba(255,255,255,.9);font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.so-body{flex:1;overflow-y:auto;padding:16px;}
+.so-section{margin-bottom:20px;}
+.so-section h4{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.so-result{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--body);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:background .2s;}
+.so-result:hover{background:#e2e8f0;}
+.so-result .sr-icon{font-size:22px;width:40px;height:40px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.so-result h5{font-size:14px;font-weight:700;}
+.so-result p{font-size:12px;color:var(--muted);margin-top:2px;}
+.so-result .sr-arr{margin-left:auto;color:var(--muted);}
+/* Voice chat overlay */
+.voice-overlay{display:none;position:fixed;inset:0;z-index:201;flex-direction:column;background:var(--navy);}
+.voice-overlay.open{display:flex;animation:fadeIn .25s ease;}
+.vo-head{padding:20px;display:flex;align-items:center;justify-content:space-between;}
+.vo-head h3{color:#fff;font-size:18px;font-weight:800;}
+.vo-close{background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;border-radius:50%;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.vo-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:20px;}
+.vo-orb{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--teal-light),var(--teal));display:flex;align-items:center;justify-content:center;font-size:54px;cursor:pointer;box-shadow:0 0 60px rgba(20,168,145,.5);}
+.vo-orb.on{animation:orbPulse 1s ease-in-out infinite;}
+.vo-status{font-size:18px;font-weight:700;color:#fff;}
+.vo-lang-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.vo-lang-btn{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:30px;padding:8px 16px;color:rgba(255,255,255,.8);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.vo-lang-btn.sel{background:var(--teal);border-color:var(--teal);color:#fff;}
+.vo-transcript{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;width:100%;min-height:80px;font-size:13px;color:rgba(255,255,255,.9);line-height:1.7;}
+.vo-wave{display:flex;gap:4px;align-items:flex-end;height:36px;}
+.vo-wb{width:5px;border-radius:3px;background:var(--teal-light);animation:wv 1s ease-in-out infinite;}
+.vo-wb:nth-child(1){height:14px;animation-delay:0s}.vo-wb:nth-child(2){height:26px;animation-delay:.1s}.vo-wb:nth-child(3){height:36px;animation-delay:.2s}.vo-wb:nth-child(4){height:20px;animation-delay:.3s}.vo-wb:nth-child(5){height:32px;animation-delay:.4s}.vo-wb:nth-child(6){height:16px;animation-delay:.5s}.vo-wb:nth-child(7){height:28px;animation-delay:.6s}
+/* type bar at bottom of voice overlay */
+.vo-type-bar{padding:16px;background:rgba(255,255,255,.05);display:flex;gap:10px;align-items:center;}
+.vo-type-input{flex:1;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:50px;padding:13px 18px;font-family:'Sora',sans-serif;font-size:14px;color:#fff;outline:none;}
+.vo-type-input::placeholder{color:rgba(255,255,255,.45);}
+.vo-send{background:var(--teal);border:none;border-radius:50%;width:44px;height:44px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fcard{display:none;}
+.sos-btn{display:none;}
+
+/* ═══ VOICE ═══ */
+#voice-screen{background:var(--navy);}
+.voice-header{background:linear-gradient(135deg,var(--teal),var(--teal2));padding:20px;color:#fff;}
+.voice-header .back{background:none;border:none;color:rgba(255,255,255,.85);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;display:block;}
+.voice-header h2{font-size:24px;font-weight:800;}
+.voice-header p{font-size:13px;opacity:.8;margin-top:4px;}
+.lang-pick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px;}
+.lpick{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 6px;cursor:pointer;text-align:center;transition:all .3s;color:#fff;}
+.lpick.sel{background:rgba(20,168,145,.3);border-color:var(--teal-light);}
+.lpick .lfl{font-size:22px;display:block;margin-bottom:4px;}
+.lpick .ln{font-size:11px;font-weight:700;}
+.lpick .ls{font-size:9px;opacity:.6;margin-top:2px;}
+.greeting-box{margin:0 16px 16px;background:rgba(20,168,145,.15);border:1.5px solid rgba(20,168,145,.3);border-radius:16px;padding:20px;text-align:center;color:#fff;}
+.greeting-box .ghand{font-size:36px;margin-bottom:10px;}
+.greeting-box h3{font-size:18px;font-weight:800;margin-bottom:8px;}
+.greeting-box p{font-size:13px;opacity:.8;line-height:1.6;}
+.orb-wrap{display:flex;flex-direction:column;align-items:center;padding:20px;gap:16px;}
+.orb{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--teal-light),var(--teal));display:flex;align-items:center;justify-content:center;font-size:54px;cursor:pointer;box-shadow:0 0 60px rgba(20,168,145,.4);transition:all .3s;}
+.orb.listening{animation:orbPulse 1s ease-in-out infinite;box-shadow:0 0 100px rgba(20,168,145,.7);}
+@keyframes orbPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.wave-row{display:flex;gap:4px;align-items:flex-end;height:40px;}
+.wb{width:5px;border-radius:3px;background:var(--teal-light);animation:wv 1s ease-in-out infinite;}
+.wb:nth-child(1){height:16px;animation-delay:0s}
+.wb:nth-child(2){height:28px;animation-delay:.1s}
+.wb:nth-child(3){height:40px;animation-delay:.2s}
+.wb:nth-child(4){height:22px;animation-delay:.3s}
+.wb:nth-child(5){height:36px;animation-delay:.4s}
+.wb:nth-child(6){height:18px;animation-delay:.5s}
+.wb:nth-child(7){height:30px;animation-delay:.6s}
+@keyframes wv{0%,100%{transform:scaleY(.3);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+.orb-status{font-size:16px;font-weight:700;color:#fff;}
+.transcript-box{margin:0 16px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:14px;padding:16px;min-height:80px;color:#fff;font-size:13px;line-height:1.7;}
+.suggestions{padding:16px;}
+.sug-title{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.sug-chip{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:8px 14px;border-radius:20px;font-size:12px;color:#fff;margin:0 6px 8px 0;cursor:pointer;transition:all .2s;}
+.sug-chip:hover{background:rgba(20,168,145,.3);border-color:var(--teal-light);}
+
+/* ═══ CONSULT ═══ */
+#consult-screen{background:var(--body);}
+.consult-hero{background:linear-gradient(135deg,var(--teal),var(--teal2));padding:20px;color:#fff;}
+.consult-hero .back{background:none;border:none;color:rgba(255,255,255,.85);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;display:block;}
+.consult-hero h2{font-size:22px;font-weight:800;}
+.consult-hero p{font-size:13px;opacity:.8;}
+.start-vid-card{margin:16px;background:var(--teal);border-radius:var(--r);padding:18px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 20px rgba(13,123,107,.3);}
+.svc-text h4{color:#fff;font-size:16px;font-weight:800;}
+.svc-text p{color:rgba(255,255,255,.8);font-size:12px;margin-top:3px;}
+.svc-btn{margin-left:auto;background:#fff;color:var(--teal);font-size:14px;font-weight:800;padding:10px 20px;border-radius:30px;border:none;cursor:pointer;white-space:nowrap;}
+.doc-list{padding:0 16px 16px;}
+.doc-card{background:var(--white);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:10px;border:1px solid var(--border);}
+.doc-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+.doc-info h5{font-size:15px;font-weight:800;}
+.doc-info p{font-size:12px;color:var(--muted);margin-top:2px;}
+.doc-status{font-size:12px;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:5px;}
+.doc-status.green{color:var(--green);}
+.doc-status.gold{color:var(--gold);}
+.consult-btn{margin-left:auto;padding:9px 18px;border-radius:30px;font-size:13px;font-weight:700;border:none;cursor:pointer;}
+.consult-btn.green{background:var(--teal);color:#fff;}
+.consult-btn.outline{background:#f1f5f9;color:var(--text);}
+
+/* VIDEO CALL */
+.video-wrap{background:#000;position:relative;}
+.doc-video{background:linear-gradient(180deg,#0a2a1a,#040f0a);min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative;}
+.doc-vid-ava{width:90px;height:90px;border-radius:50%;border:3px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:40px;animation:vidGlow 2s ease-in-out infinite;}
+@keyframes vidGlow{0%,100%{box-shadow:0 0 20px rgba(20,168,145,.4)}50%{box-shadow:0 0 50px rgba(20,168,145,.8)}}
+.ring-wrap{position:absolute;width:90px;height:90px;}
+.ring{position:absolute;border-radius:50%;border:2px solid rgba(20,168,145,.3);animation:ringEx 2s ease-out infinite;}
+.ring:nth-child(1){width:100%;height:100%;}
+.ring:nth-child(2){width:140%;height:140%;top:-20%;left:-20%;animation-delay:.5s;}
+.ring:nth-child(3){width:180%;height:180%;top:-40%;left:-40%;animation-delay:1s;}
+@keyframes ringEx{0%{opacity:.8;transform:scale(.8)}100%{opacity:0;transform:scale(1.5)}}
+.self-vid{position:absolute;bottom:12px;right:12px;width:80px;height:106px;border-radius:10px;border:2px solid var(--teal);background:linear-gradient(135deg,#2a1a3a,#1a0a20);display:flex;align-items:center;justify-content:center;font-size:24px;}
+.live-pill{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.6);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:6px;font-size:11px;color:#fff;font-weight:700;}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.call-timer-text{font-size:26px;font-weight:800;color:#fff;}
+.call-status-text{font-size:13px;color:rgba(255,255,255,.7);}
+.vid-ctrls{background:var(--navy);padding:16px 20px;display:flex;justify-content:space-around;align-items:center;}
+.vbtn{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px;gap:2px;transition:all .2s;}
+.vbtn span:last-child{font-size:8px;color:rgba(255,255,255,.7);}
+.vbtn.dark{background:#1e3040;color:#fff;}
+.vbtn.active{background:var(--teal);color:#fff;}
+.vbtn.end{background:var(--red);color:#fff;width:60px;height:60px;font-size:20px;box-shadow:0 4px 16px rgba(220,38,38,.4);}
+.connecting-ov{position:absolute;inset:0;background:rgba(0,0,0,.75);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10;}
+.spin{width:50px;height:50px;border-radius:50%;border:3px solid rgba(255,255,255,.2);border-top-color:var(--teal-light);animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══ FACILITIES / MAP ═══ */
+#facilities-screen{background:var(--body);}
+.fac-hero{background:linear-gradient(135deg,var(--teal),var(--teal2));padding:20px;color:#fff;}
+.fac-hero .back{background:none;border:none;color:rgba(255,255,255,.85);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;display:block;}
+.map-box{margin:16px;border-radius:var(--r);overflow:hidden;background:linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px) 0 0/36px 36px,linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px) 0 0/36px 36px,linear-gradient(160deg,#0a2a1a,#061410);height:240px;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.2);}
+.yobe-shape{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:200px;height:160px;border:2.5px solid rgba(20,168,145,.4);border-radius:30% 40% 35% 45%/40% 35% 45% 30%;box-shadow:inset 0 0 40px rgba(20,168,145,.1);}
+.mpin{position:absolute;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;animation:pinBounce .9s ease-in-out infinite alternate;}
+@keyframes pinBounce{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+.mpin.g{background:rgba(13,123,107,.9);box-shadow:0 0 16px rgba(13,123,107,.7);}
+.mpin.r{background:rgba(220,38,38,.9);box-shadow:0 0 16px rgba(220,38,38,.7);}
+.mpin.o{background:rgba(217,119,6,.9);box-shadow:0 0 16px rgba(217,119,6,.7);}
+.mpin-label{position:absolute;background:rgba(0,0,0,.8);color:#fff;padding:3px 8px;border-radius:6px;font-size:9px;white-space:nowrap;bottom:32px;left:50%;transform:translateX(-50%);}
+.you-dot{position:absolute;width:14px;height:14px;border-radius:50%;background:#F59E0B;border:3px solid #fff;box-shadow:0 0 16px #F59E0B;animation:pinBounce .9s ease-in-out infinite alternate;}
+.map-legend{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.75);border-radius:10px;padding:10px 12px;}
+.mleg{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:9px;color:#fff;}
+.mleg:last-child{margin:0;}
+.mleg-dot{width:8px;height:8px;border-radius:50%;}
+.gps-fab{position:absolute;bottom:10px;right:10px;width:40px;height:40px;border-radius:50%;background:var(--teal);border:none;font-size:16px;cursor:pointer;color:#fff;box-shadow:0 3px 14px rgba(13,123,107,.5);display:flex;align-items:center;justify-content:center;}
+.gps-fab.spin-it{animation:spin .8s linear infinite;}
+.fac-cards{padding:0 16px 80px;}
+.fac-card2{background:var(--white);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid var(--border);transition:all .2s;}
+.fac-card2:hover{border-color:var(--teal);}
+.fac-ico{width:42px;height:42px;border-radius:12px;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.fac-inf h5{font-size:14px;font-weight:700;}
+.fac-inf p{font-size:11px;color:var(--muted);margin-top:2px;}
+.fac-dist{margin-left:auto;text-align:right;}
+.fac-km{font-size:13px;font-weight:800;color:var(--teal);}
+.fac-open{font-size:10px;color:var(--green);}
+.fac-closed{font-size:10px;color:var(--red);}
+
+/* ═══ MATERNAL ═══ */
+#maternal-screen{background:var(--body);}
+.mat-header{background:linear-gradient(135deg,var(--purple),var(--purple2));padding:22px 20px 28px;color:#fff;position:relative;overflow:hidden;}
+.mat-header::before{content:'🤰';position:absolute;right:-10px;top:-10px;font-size:100px;opacity:.15;}
+.mat-header .back{background:none;border:none;color:rgba(255,255,255,.8);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;display:block;}
+.mat-header .sub{font-size:12px;opacity:.75;}
+.mat-header h2{font-size:22px;font-weight:800;}
+.vital-row{display:flex;gap:0;background:#fff;border-radius:16px;margin:-14px 16px 0;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+.vital-item{flex:1;padding:14px 8px;text-align:center;border-right:1px solid var(--border);}
+.vital-item:last-child{border:none;}
+.vital-item .vi{font-size:16px;}
+.vital-item .vv{font-size:14px;font-weight:800;margin-top:3px;}
+.vital-item .vl{font-size:9px;color:var(--muted);margin-top:2px;}
+.mat-tabs{display:flex;gap:8px;padding:20px 16px 8px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;}
+.mat-tabs::-webkit-scrollbar{display:none;}
+.mtab{padding:9px 16px;border-radius:30px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;border:2px solid var(--border);background:#fff;color:var(--muted);}
+.mtab.sel{background:var(--purple);color:#fff;border-color:var(--purple);}
+.mat-content{padding:0 16px 80px;}
+.prog-card{background:#fff;border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.prog-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.prog-label span:first-child{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.prog-label span:last-child{font-size:18px;font-weight:800;color:var(--purple);}
+.prog-bar-bg{background:#EDE9FE;border-radius:10px;height:10px;overflow:hidden;}
+.prog-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--purple-light));border-radius:10px;}
+.prog-sub{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);}
+.antenatal-card{background:linear-gradient(135deg,var(--purple),var(--purple2));border-radius:var(--r);padding:18px;margin-bottom:14px;color:#fff;}
+.antenatal-card .alabel{font-size:10px;opacity:.75;text-transform:uppercase;letter-spacing:1px;}
+.antenatal-card h3{font-size:20px;font-weight:800;margin:4px 0;}
+.antenatal-card p{font-size:12px;opacity:.8;}
+.antenatal-card .abadge{float:right;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:800;margin-top:-26px;}
+.info-card{background:#fff;border-radius:var(--r);padding:16px;margin-bottom:12px;border-left:4px solid var(--purple);}
+.info-card .ic-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.info-card .ic-icon{font-size:22px;}
+.info-card h4{font-size:14px;font-weight:800;color:var(--purple);}
+.info-card p{font-size:13px;color:var(--text);line-height:1.6;}
+/* Tabs content */
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.ex-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+.ex-icon{width:48px;height:48px;border-radius:14px;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.ex-info h5{font-size:14px;font-weight:700;}
+.ex-info p{font-size:12px;color:var(--muted);margin-top:2px;}
+.ex-dur{margin-left:auto;text-align:right;font-size:12px;color:var(--purple);font-weight:700;}
+.nut-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;}
+.nut-card h5{font-size:14px;font-weight:700;margin-bottom:8px;}
+.nut-row{display:flex;flex-wrap:wrap;gap:6px;}
+.nut-chip{background:var(--purple-bg);color:var(--purple);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.dos-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;}
+.dos-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.dos-item:last-child{margin:0;}
+.dos-icon{font-size:16px;flex-shrink:0;margin-top:2px;}
+.dos-text{font-size:13px;line-height:1.5;}
+.dos-text.good{color:var(--green);}
+.dos-text.bad{color:var(--red);}
+
+/* ═══ ALERTS ═══ */
+#alerts-screen{background:var(--body);}
+.alert-hero{background:linear-gradient(135deg,var(--red),#991b1b);padding:20px;color:#fff;}
+.alert-hero .back{background:none;border:none;color:rgba(255,255,255,.8);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;display:block;}
+.alert-hero h2{font-size:22px;font-weight:800;}
+.alert-hero p{font-size:13px;opacity:.8;}
+.alert-level-banner{margin:16px;border-radius:var(--r);background:var(--red);padding:16px;color:#fff;}
+.alb-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.alb-icon{font-size:28px;}
+.alb-text h4{font-size:16px;font-weight:800;}
+.alb-text p{font-size:12px;opacity:.85;margin-top:2px;}
+.alb-bar-bg{background:rgba(255,255,255,.2);border-radius:6px;height:6px;margin-bottom:8px;}
+.alb-bar{width:72%;height:100%;background:#fff;border-radius:6px;}
+.alb-meta{display:flex;justify-content:space-between;font-size:10px;opacity:.8;}
+.disease-card{background:var(--white);border-radius:var(--r);margin:0 16px 12px;overflow:hidden;border:1px solid var(--border);}
+.dc-header{padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.dc-icon{font-size:22px;}
+.dc-name h5{font-size:15px;font-weight:800;}
+.dc-name p{font-size:11px;color:var(--muted);}
+.dc-badge{margin-left:auto;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:800;}
+.dc-badge.high{background:#FEE2E2;color:var(--red);}
+.dc-badge.medium{background:#FEF3C7;color:var(--gold);}
+.dc-badge.low{background:#DCFCE7;color:var(--green);}
+.dc-body{padding:0 16px 16px;display:none;}
+.dc-body.open{display:block;}
+.dc-section{margin-bottom:12px;}
+.dc-section h6{font-size:12px;font-weight:800;color:var(--teal);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.dc-section ul{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.dc-section ul li{font-size:13px;line-height:1.5;padding-left:14px;position:relative;color:var(--text);}
+.dc-section ul li::before{content:'•';position:absolute;left:0;color:var(--teal);}
+.dc-section ol{list-style:none;counter-reset:steps;display:flex;flex-direction:column;gap:6px;}
+.dc-section ol li{font-size:13px;line-height:1.5;padding-left:20px;position:relative;counter-increment:steps;}
+.dc-section ol li::before{content:counter(steps);position:absolute;left:0;width:16px;height:16px;background:var(--teal);color:#fff;border-radius:50%;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.dc-warning{background:#FEF2F2;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--red);font-weight:700;margin-top:10px;}
+.dc-toggle{font-size:14px;color:var(--muted);transition:transform .2s;}
+.dc-toggle.open{transform:rotate(180deg);}
+
+/* MODALS */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;backdrop-filter:blur(4px);}
+.modal-bg.show{display:flex;}
+.modal{background:var(--white);width:100%;border-radius:24px 24px 0 0;padding:24px;animation:slideUp .3s ease;max-height:80vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal h3{font-size:20px;font-weight:800;margin-bottom:8px;}
+.modal p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+.modal-close{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);}
+.modal-btn{width:100%;padding:15px;border-radius:50px;border:none;cursor:pointer;font-size:15px;font-weight:700;margin-top:8px;}
+.modal-btn.teal{background:var(--teal);color:#fff;box-shadow:0 4px 16px rgba(13,123,107,.35);}
+.modal-btn.red{background:var(--red);color:#fff;box-shadow:0 4px 16px rgba(220,38,38,.35);}
+.modal-btn.outline{background:#f1f5f9;color:var(--text);}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:1000;white-space:nowrap;animation:fadeIn .3s ease;pointer-events:none;}
+
+/* ═══ LOGIN / OTP SCREENS ═══ */
+#login-screen{background:linear-gradient(160deg,#0D7B6B 0%,#0a4a3f 50%,#0D1B2A 100%);justify-content:center;align-items:center;padding:32px 28px;}
+.login-box{width:100%;max-width:360px;text-align:center;}
+.login-logo{font-size:52px;margin-bottom:12px;}
+.login-title{font-size:30px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
+.login-title span{color:#5EEAD4;}
+.login-sub{font-size:14px;color:rgba(255,255,255,.65);margin:8px 0 32px;line-height:1.5;}
+.login-field{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:12px;margin-bottom:14px;transition:border .2s;}
+.login-field:focus-within{border-color:rgba(255,255,255,.5);}
+.login-field span{font-size:20px;flex-shrink:0;}
+.login-field input{background:none;border:none;outline:none;color:#fff;font-size:16px;font-family:'Sora',sans-serif;width:100%;font-weight:500;}
+.login-field input::placeholder{color:rgba(255,255,255,.4);}
+.login-btn{width:100%;background:#5EEAD4;border:none;border-radius:14px;padding:18px;font-size:16px;font-weight:800;color:var(--navy);cursor:pointer;margin-top:6px;transition:opacity .2s;letter-spacing:.3px;}
+.login-btn:active{opacity:.85;}
+.login-btn:disabled{opacity:.5;cursor:not-allowed;}
+.login-note{font-size:12px;color:rgba(255,255,255,.4);margin-top:16px;line-height:1.6;}
+.login-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:rgba(255,255,255,.3);font-size:12px;}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.15);}
+
+/* OTP inputs */
+.otp-row{display:flex;gap:10px;justify-content:center;margin:24px 0;}
+.otp-box{width:52px;height:60px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);border-radius:14px;text-align:center;font-size:24px;font-weight:800;color:#fff;font-family:'Sora',sans-serif;outline:none;caret-color:#5EEAD4;}
+.otp-box:focus{border-color:#5EEAD4;background:rgba(255,255,255,.18);}
+.otp-phone-display{background:rgba(255,255,255,.1);border-radius:10px;padding:10px 16px;margin-bottom:20px;font-size:14px;color:rgba(255,255,255,.8);}
+.otp-resend{background:none;border:none;color:#5EEAD4;font-size:13px;font-family:'Sora',sans-serif;cursor:pointer;padding:8px;margin-top:4px;}
+.otp-back{background:none;border:none;color:rgba(255,255,255,.5);font-size:13px;font-family:'Sora',sans-serif;cursor:pointer;padding:8px;}
+.login-name-row{display:flex;gap:10px;}
+
+/* ═══ PROFILE SCREEN ═══ */
+#profile-screen{background:var(--body);}
+.prof-hero{background:linear-gradient(160deg,var(--teal),var(--navy));padding:32px 20px 60px;text-align:center;position:relative;}
+.prof-avatar{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#fff;margin:0 auto 12px;font-family:'Sora',sans-serif;}
+.prof-name{font-size:22px;font-weight:800;color:#fff;}
+.prof-phone{font-size:13px;color:rgba(255,255,255,.65);margin-top:4px;}
+.prof-badge{display:inline-block;background:rgba(255,255,255,.18);color:#5EEAD4;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;margin-top:10px;}
+.prof-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:-32px 16px 20px;position:relative;z-index:2;}
+.prof-stat{background:var(--white);border-radius:16px;padding:16px 12px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.08);}
+.prof-stat .ps-num{font-size:22px;font-weight:800;color:var(--teal);}
+.prof-stat .ps-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:3px;}
+.prof-section{background:var(--white);border-radius:16px;margin:0 16px 14px;overflow:hidden;border:1px solid var(--border);}
+.prof-section-title{padding:14px 16px 10px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);}
+.prof-row{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border);}
+.prof-row:last-child{border-bottom:none;}
+.prof-row:active{background:var(--body);}
+.prof-row-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.prof-row-body{flex:1;}
+.prof-row-body h5{font-size:14px;font-weight:700;}
+.prof-row-body p{font-size:12px;color:var(--muted);margin-top:2px;}
+.prof-row-arr{color:var(--muted);font-size:16px;}
+.prof-logout{width:calc(100% - 32px);margin:4px 16px 24px;background:var(--red-bg);border:1.5px solid var(--red);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:var(--red);cursor:pointer;font-family:'Sora',sans-serif;}
+</style>
+</head>
+<body>
+<script>
+// Runs instantly before any HTML paints — forces splash to show
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
+  });
+  document.getElementById('splash').classList.add('active');
+});
+</script>
+
+<!-- ═══════ SPLASH ═══════ -->
+<div class="screen" id="splash">
+  <div class="splash-logo">🏥</div>
+  <h1 class="splash-title">Yobe<span>Care</span></h1>
+  <p class="splash-tag">Your Doctor. Your Language. Anywhere in Yobe.</p>
+  <div class="splash-state">📍 Yobe State, Nigeria</div>
+
+  <p style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">Choose Your Language / Za'bi Harshe</p>
+  <div class="lang-grid">
+    <div class="lbtn sel" onclick="selectLang(this,'ha')">
+      <span class="lflag">🗣</span>
+      <div class="lname">Hausa</div>
+      <div class="lsub">هَوُسَ</div>
+    </div>
+    <div class="lbtn" onclick="selectLang(this,'ka')">
+      <span class="lflag">🌍</span>
+      <div class="lname">Kanuri</div>
+      <div class="lsub">Kānùrī</div>
+    </div>
+    <div class="lbtn" onclick="selectLang(this,'fu')">
+      <span class="lflag">🗣</span>
+      <div class="lname">Fulfulde</div>
+      <div class="lsub">Fula</div>
+    </div>
+    <div class="lbtn" onclick="selectLang(this,'en')">
+      <span class="lflag">🇬🇧</span>
+      <div class="lname">English</div>
+      <div class="lsub">English</div>
+    </div>
+  </div>
+
+  <button class="btn-start" onclick="goTo('login-screen')">Get Started — Fara →</button>
+  <p class="credits">Powered by 3MTT Nigeria · NextGen Knowledge Showcase 2026</p>
+</div>
+
+<!-- ═══════ LOGIN SCREEN ═══════ -->
+<div class="screen" id="login-screen" style="background:linear-gradient(160deg,#0D7B6B 0%,#0a4a3f 50%,#0D1B2A 100%);justify-content:center;align-items:center;padding:32px 28px;">
+  <div class="login-box">
+    <div class="login-logo">🏥</div>
+    <h1 class="login-title">Yobe<span>Care</span></h1>
+    <p class="login-sub">Your doctor, your language, anywhere in Yobe State. Sign in to continue.</p>
+
+    <div class="login-name-row">
+      <div class="login-field" style="flex:1;">
+        <span>👤</span>
+        <input id="login-name" type="text" placeholder="Your name" autocomplete="name">
+      </div>
+    </div>
+
+    <div class="login-field">
+      <span>🇳🇬</span>
+      <input id="login-phone" type="tel" placeholder="080XXXXXXXX" maxlength="11" autocomplete="tel" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+    </div>
+
+    <select id="login-lga" style="width:100%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:14px;padding:16px 18px;font-size:15px;color:rgba(255,255,255,.7);font-family:'Sora',sans-serif;outline:none;margin-bottom:14px;-webkit-appearance:none;">
+      <option value="" disabled selected style="background:#0D1B2A;">📍 Select your LGA</option>
+      <option style="background:#0D1B2A;" value="Damaturu">Damaturu</option>
+      <option style="background:#0D1B2A;" value="Potiskum">Potiskum</option>
+      <option style="background:#0D1B2A;" value="Gashua">Gashua (Bade)</option>
+      <option style="background:#0D1B2A;" value="Geidam">Geidam</option>
+      <option style="background:#0D1B2A;" value="Nguru">Nguru</option>
+      <option style="background:#0D1B2A;" value="Gujba">Gujba / Buni Yadi</option>
+      <option style="background:#0D1B2A;" value="Jakusko">Jakusko</option>
+      <option style="background:#0D1B2A;" value="Nangere">Nangere</option>
+      <option style="background:#0D1B2A;" value="Gulani">Gulani</option>
+      <option style="background:#0D1B2A;" value="Fika">Fika</option>
+      <option style="background:#0D1B2A;" value="Yunusari">Yunusari</option>
+      <option style="background:#0D1B2A;" value="Machina">Machina</option>
+      <option style="background:#0D1B2A;" value="Yusufari">Yusufari</option>
+      <option style="background:#0D1B2A;" value="Karasuwa">Karasuwa</option>
+      <option style="background:#0D1B2A;" value="Bursari">Bursari</option>
+      <option style="background:#0D1B2A;" value="Tarmuwa">Tarmuwa</option>
+      <option style="background:#0D1B2A;" value="Fune">Fune</option>
+    </select>
+
+    <button class="login-btn" onclick="submitLogin()" id="login-send-btn">Send Verification Code →</button>
+    <p class="login-note">We'll send a 6-digit code to your phone via SMS.<br>Standard SMS rates may apply.</p>
+  </div>
+</div>
+
+<!-- ═══════ OTP SCREEN ═══════ -->
+<div class="screen" id="otp-screen" style="background:linear-gradient(160deg,#0D7B6B 0%,#0a4a3f 50%,#0D1B2A 100%);justify-content:center;align-items:center;padding:32px 28px;">
+  <div class="login-box">
+    <div style="font-size:48px;margin-bottom:16px;">📱</div>
+    <h2 style="color:#fff;font-size:26px;font-weight:800;margin-bottom:8px;">Enter Code</h2>
+    <p style="color:rgba(255,255,255,.65);font-size:14px;margin-bottom:20px;">We sent a 6-digit code to</p>
+    <div class="otp-phone-display" id="otp-phone-display">+234 XXX XXX XXXX</div>
+
+    <div class="otp-row">
+      <input class="otp-box" id="otp1" maxlength="1" type="tel" oninput="otpNext(this,'otp2')" onkeydown="otpBack(event,this,'')">
+      <input class="otp-box" id="otp2" maxlength="1" type="tel" oninput="otpNext(this,'otp3')" onkeydown="otpBack(event,this,'otp1')">
+      <input class="otp-box" id="otp3" maxlength="1" type="tel" oninput="otpNext(this,'otp4')" onkeydown="otpBack(event,this,'otp2')">
+      <input class="otp-box" id="otp4" maxlength="1" type="tel" oninput="otpNext(this,'otp5')" onkeydown="otpBack(event,this,'otp3')">
+      <input class="otp-box" id="otp5" maxlength="1" type="tel" oninput="otpNext(this,'otp6')" onkeydown="otpBack(event,this,'otp4')">
+      <input class="otp-box" id="otp6" maxlength="1" type="tel" oninput="otpNext(this,'')"     onkeydown="otpBack(event,this,'otp5')">
+    </div>
+
+    <button class="login-btn" onclick="verifyOTP()" id="otp-verify-btn">Verify & Continue →</button>
+
+    <div style="margin-top:16px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+      <button class="otp-resend" onclick="resendOTP()">↺ Resend Code</button>
+      <span style="color:rgba(255,255,255,.2);">|</span>
+      <button class="otp-back" onclick="goTo('login-screen')">← Change Number</button>
+    </div>
+
+    <p class="login-note" style="margin-top:12px;" id="otp-hint">💡 Demo: enter any 6 digits to continue</p>
+  </div>
+</div>
+
+<!-- ═══════ PROFILE SCREEN ═══════ -->
+<div class="screen" id="profile-screen">
+  <div class="prof-hero">
+    <button style="position:absolute;top:16px;left:16px;background:none;border:none;color:rgba(255,255,255,.7);font-size:13px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;" onclick="goTo('home')">← Back</button>
+    <div class="prof-avatar" id="prof-avatar">MY</div>
+    <div class="prof-name" id="prof-name-display">Malam Yusuf</div>
+    <div class="prof-phone" id="prof-phone-display">+234 810 000 0000</div>
+    <div class="prof-badge" id="prof-lga-display">📍 Damaturu LGA</div>
+  </div>
+
+  <div class="prof-stats">
+    <div class="prof-stat">
+      <div class="ps-num">3</div>
+      <div class="ps-lbl">Consults</div>
+    </div>
+    <div class="prof-stat">
+      <div class="ps-num">Wk 26</div>
+      <div class="ps-lbl">Pregnancy</div>
+    </div>
+    <div class="prof-stat">
+      <div class="ps-num">4</div>
+      <div class="ps-lbl">Records</div>
+    </div>
+  </div>
+
+  <div class="scroll" style="padding-bottom:100px;">
+
+    <div class="prof-section">
+      <div class="prof-section-title">My Health</div>
+      <div class="prof-row" onclick="goTo('consult-screen')">
+        <div class="prof-row-icon" style="background:#FFF7ED;">📋</div>
+        <div class="prof-row-body"><h5>Appointment History</h5><p>3 consultations · Last: Dr. Ibrahim Mele</p></div>
+        <span class="prof-row-arr">›</span>
+      </div>
+      <div class="prof-row" onclick="goTo('maternal-screen')">
+        <div class="prof-row-icon" style="background:#FDF2F8;">🤰</div>
+        <div class="prof-row-body"><h5>Maternal Care Record</h5><p>Week 26 · Next visit: Mar 12</p></div>
+        <span class="prof-row-arr">›</span>
+      </div>
+      <div class="prof-row" onclick="showToast('💊 Opening prescriptions…')">
+        <div class="prof-row-icon" style="background:#F0FDF4;">💊</div>
+        <div class="prof-row-body"><h5>Prescriptions</h5><p>2 active · 1 expired</p></div>
+        <span class="prof-row-arr">›</span>
+      </div>
+    </div>
+
+    <div class="prof-section">
+      <div class="prof-section-title">Settings</div>
+      <div class="prof-row" onclick="showToast('🌐 Language settings opening…')">
+        <div class="prof-row-icon" style="background:#EFF6FF;">🌐</div>
+        <div class="prof-row-body"><h5>Language</h5><p id="prof-lang-display">Hausa</p></div>
+        <span class="prof-row-arr">›</span>
+      </div>
+      <div class="prof-row" onclick="showToast('🔔 Notification settings…')">
+        <div class="prof-row-icon" style="background:#F0FDF4;">🔔</div>
+        <div class="prof-row-body"><h5>Notifications</h5><p>Disease alerts · Appointment reminders</p></div>
+        <span class="prof-row-arr">›</span>
+      </div>
+      <div class="prof-row" onclick="showToast('🔒 Privacy settings…')">
+        <div class="prof-row-icon" style="background:#FFF7ED;">🔒</div>
+        <div class="prof-row-body"><h5>Privacy & Data</h5><p>Your data is encrypted and secure</p></div>
+        <span class="prof-row-arr">›</span>
+      </div>
+    </div>
+
+    <div class="prof-section">
+      <div class="prof-section-title">Support</div>
+      <div class="prof-row" onclick="showToast('📞 Calling YobeCare support…')">
+        <div class="prof-row-icon" style="background:#E8F5F3;">📞</div>
+        <div class="prof-row-body"><h5>Contact Support</h5><p>0800-YOBECARE · Available 8am–8pm</p></div>
+        <span class="prof-row-arr">›</span>
+      </div>
+      <div class="prof-row" onclick="showToast('ℹ️ About YobeCare v1.0')">
+        <div class="prof-row-icon" style="background:#F5F0FF;">ℹ️</div>
+        <div class="prof-row-body"><h5>About YobeCare</h5><p>Version 1.0 · 3MTT Nigeria 2025</p></div>
+        <span class="prof-row-arr">›</span>
+      </div>
+    </div>
+
+    <button class="prof-logout" onclick="logOut()">🚪 Log Out</button>
+  </div>
+
+  <nav class="bnav">
+    <button class="bni" onclick="goTo('home')"><span class="icon">🏠</span>Home</button>
+    <button class="bni" onclick="goTo('facilities-screen')"><span class="icon">🗺️</span>Facilities</button>
+    <button class="bni" onclick="goTo('voice-screen')"><span class="icon">🎙️</span>Voice</button>
+    <button class="bni" onclick="goTo('consult-screen')"><span class="icon">📱</span>Consult</button>
+    <button class="bni" onclick="goTo('maternal-screen')"><span class="icon">🤰</span>Maternal</button>
+    <button class="bni active"><span class="icon">👤</span>Profile</button>
+  </nav>
+</div>
+
+<!-- ═══════ HOME ═══════ -->
+<div class="screen" id="home">
+  <div class="home-head">
+    <div class="home-head-top">
+      <div>
+        <p class="greet">Good morning 🌿</p>
+        <h2 class="uname">Malam Yusuf</h2>
+      </div>
+      <div class="user-avatar" onclick="goTo('profile-screen')" style="cursor:pointer;" title="My Profile">MY</div>
+    </div>
+    <div class="search-row">
+      <div class="search-box" onclick="openSearch()">
+        <span>🔍</span>
+        <p>Search doctors, facilities…</p>
+      </div>
+      <div class="mic-pill" onclick="openVoiceOverlay()">🎙️</div>
+    </div>
+    <!-- Wave divider -->
+    <svg class="home-wave" viewBox="0 0 430 28" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,28 C80,0 180,28 280,10 C360,-2 400,20 430,28 L430,28 L0,28 Z" fill="#EEF2F7"/>
+    </svg>
+  </div>
+
+  <div class="scroll">
+    <p class="sec-title">QUICK ACCESS</p>
+    <div class="qa-grid">
+      <div class="qa-card c-teal" onclick="goTo('facilities-screen')">
+        <div class="qa-icon">🗺️</div>
+        <h4>Find Facilities</h4>
+        <p>Clinics near you</p>
+      </div>
+      <div class="qa-card c-orange" onclick="goTo('consult-screen')">
+        <div class="qa-icon">📱</div>
+        <h4>Telemedicine</h4>
+        <p>Consult a doctor</p>
+      </div>
+      <div class="qa-card c-purple" onclick="goTo('voice-screen')">
+        <div class="qa-icon">🎙️</div>
+        <h4>Voice Assistant</h4>
+        <p>Hausa · Kanuri · Fulfulde</p>
+      </div>
+      <div class="qa-card c-dark" onclick="goTo('maternal-screen')">
+        <div class="qa-icon">🤰</div>
+        <h4>Maternal Care</h4>
+        <p>Track pregnancy</p>
+      </div>
+      <div class="qa-card c-red" onclick="goTo('alerts-screen')">
+        <div class="qa-icon">🚨</div>
+        <h4>Outbreak Alerts</h4>
+        <p>Disease reports</p>
+      </div>
+    </div>
+
+    <p class="sec-title">ACTIVE ALERT</p>
+    <div class="active-alert-strip" onclick="goTo('alerts-screen')">
+      <span class="aa-dot"></span>
+      <div>
+        <h5>⚠️ Cholera Alert — Yobe State</h5>
+        <p>4 high-risk diseases active · All 17 LGAs</p>
+      </div>
+      <span class="aa-arr">→</span>
+    </div>
+
+    <div class="sos-bar" onclick="showModal('sos-modal')">
+      <span style="font-size:28px;">🆘</span>
+      <div>
+        <h4>Emergency SOS</h4>
+        <p>Alert nearest health responders instantly</p>
+      </div>
+      <span style="margin-left:auto;color:rgba(255,255,255,.7);font-size:18px;">→</span>
+    </div>
+
+    <a href="https://yobealert-ng.netlify.app" target="_blank" style="display:flex;align-items:center;gap:14px;margin:10px 16px 4px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:16px;padding:16px;text-decoration:none;">
+      <span style="font-size:28px;">🛡️</span>
+      <div>
+        <h4 style="color:#fff;font-size:15px;font-weight:800;margin-bottom:2px;">Report Security Emergency</h4>
+        <p style="color:rgba(255,255,255,.7);font-size:12px;">Anonymous · YobeAlert · Instant WhatsApp alert</p>
+      </div>
+      <span style="margin-left:auto;color:rgba(255,255,255,.5);font-size:18px;">→</span>
+    </a>
+  </div>
+
+  <nav class="bnav">
+    <button class="bni active"><span class="icon">🏠</span>Home</button>
+    <button class="bni" onclick="goTo('facilities-screen')"><span class="icon">🗺️</span>Facilities</button>
+    <button class="bni" onclick="goTo('voice-screen')"><span class="icon">🎙️</span>Voice</button>
+    <button class="bni" onclick="goTo('consult-screen')"><span class="icon">📱</span>Consult</button>
+    <button class="bni" onclick="goTo('maternal-screen')"><span class="icon">🤰</span>Maternal</button>
+    <button class="bni" onclick="goTo('alerts-screen')"><span class="icon">🚨</span>Alerts</button>
+    <button class="bni" onclick="goTo('profile-screen')"><span class="icon">👤</span>Profile</button>
+  </nav>
+</div>
+
+<!-- ═══════ SEARCH OVERLAY ═══════ -->
+<div class="search-overlay" id="search-overlay">
+  <div class="so-head">
+    <div class="so-input-row">
+      <input class="so-input" id="so-input" type="text" placeholder="Search doctors, facilities, symptoms…" oninput="filterSearch(this.value)" autofocus>
+      <button class="so-cancel" onclick="closeSearch()">Cancel</button>
+    </div>
+  </div>
+  <div class="so-body" id="so-body">
+    <div class="so-section">
+      <h4>Doctors</h4>
+      <div class="so-result" onclick="startVideoCall('Dr. Ibrahim Mele');closeSearch()">
+        <div class="sr-icon">👨‍⚕️</div>
+        <div><h5>Dr. Ibrahim Mele</h5><p>General Physician · Damaturu · Available</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+      <div class="so-result" onclick="startVideoCall('Dr. Aisha Garba');closeSearch()">
+        <div class="sr-icon">👩‍⚕️</div>
+        <div><h5>Dr. Aisha Garba</h5><p>Obstetrician · Potiskum · Available</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+      <div class="so-result" onclick="startVideoCall('Dr. Hauwa Musa');closeSearch()">
+        <div class="sr-icon">👩‍⚕️</div>
+        <div><h5>Dr. Hauwa Musa</h5><p>General Physician · Nguru · Available</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+      <div class="so-result" onclick="startVideoCall('Dr. Suleiman Baka');closeSearch()">
+        <div class="sr-icon">👨‍⚕️</div>
+        <div><h5>Dr. Suleiman Baka</h5><p>Paediatrician · Gashua · In 15 mins</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+    </div>
+    <div class="so-section">
+      <h4>Facilities</h4>
+      <div class="so-result" onclick="showFac('Yobe State Specialist Hospital','Damaturu','2.1km','All departments');closeSearch()">
+        <div class="sr-icon">🏥</div>
+        <div><h5>Yobe State Specialist Hospital</h5><p>Damaturu · 2.1km · Open now</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+      <div class="so-result" onclick="showFac('Federal Medical Centre','Damaturu','3.2km','Tertiary hospital');closeSearch()">
+        <div class="sr-icon">🏨</div>
+        <div><h5>Federal Medical Centre Damaturu</h5><p>Damaturu · 3.2km · Open now</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+      <div class="so-result" onclick="showFac('Geidam General Hospital','Geidam','8.4km','Emergency 24hrs');closeSearch()">
+        <div class="sr-icon">🏥</div>
+        <div><h5>Geidam General Hospital</h5><p>Geidam · 8.4km · Open now</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+      <div class="so-result" onclick="showFac('Potiskum PHC','Potiskum','12.1km','Primary Health Care');closeSearch()">
+        <div class="sr-icon">🏪</div>
+        <div><h5>Potiskum PHC</h5><p>Potiskum · 12.1km</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+    </div>
+    <div class="so-section">
+      <h4>Quick Searches</h4>
+      <div class="so-result" onclick="goTo('alerts-screen');closeSearch()">
+        <div class="sr-icon">🦟</div>
+        <div><h5>Malaria symptoms & first aid</h5><p>Disease Alerts</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+      <div class="so-result" onclick="goTo('alerts-screen');closeSearch()">
+        <div class="sr-icon">💧</div>
+        <div><h5>Cholera first aid</h5><p>Disease Alerts</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+      <div class="so-result" onclick="goTo('maternal-screen');closeSearch()">
+        <div class="sr-icon">🤰</div>
+        <div><h5>Pregnancy tips — Week 26</h5><p>Maternal Care</p></div>
+        <span class="sr-arr">→</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ VOICE OVERLAY ═══════ -->
+<div class="voice-overlay" id="voice-overlay">
+  <div class="vo-head">
+    <h3>🎙️ AI Health Voice</h3>
+    <button class="vo-close" onclick="closeVoiceOverlay()">✕</button>
+  </div>
+  <div class="vo-body">
+    <div class="vo-lang-row">
+      <button class="vo-lang-btn sel" onclick="voPickLang(this,'ha')">Hausa</button>
+      <button class="vo-lang-btn" onclick="voPickLang(this,'ka')">🌍 Kanuri</button>
+      <button class="vo-lang-btn" onclick="voPickLang(this,'fu')">Fulfulde</button>
+      <button class="vo-lang-btn" onclick="voPickLang(this,'en')">🇬🇧 English</button>
+    </div>
+    <div class="vo-orb" id="vo-orb" onclick="toggleVoiceOverlay()">
+      <span id="vo-icon">🎙️</span>
+    </div>
+    <div class="vo-wave" id="vo-wave" style="display:none;">
+      <div class="vo-wb"></div><div class="vo-wb"></div><div class="vo-wb"></div>
+      <div class="vo-wb"></div><div class="vo-wb"></div><div class="vo-wb"></div><div class="vo-wb"></div>
+    </div>
+    <p class="vo-status" id="vo-status">Tap orb to speak</p>
+    <div class="vo-transcript" id="vo-transcript">
+      <span style="color:rgba(255,255,255,.3);font-size:13px;">Ask anything about your health in any language…</span>
+    </div>
+  </div>
+  <div class="vo-type-bar">
+    <input class="vo-type-input" id="vo-type" type="text" placeholder="Or type your question here…" onkeydown="if(event.key==='Enter')sendVoiceType()">
+    <button class="vo-send" onclick="sendVoiceType()">➤</button>
+  </div>
+</div>
+
+<!-- ═══════ VOICE SCREEN ═══════ -->
+<div class="screen" id="voice-screen">
+  <div class="voice-header">
+    <button class="back" onclick="goTo('home')">← Back</button>
+    <h2>🎙️ Speak Your Language</h2>
+    <p>AI Health Assistant · Yobe State</p>
+  </div>
+
+  <div class="scroll" style="background:var(--navy);">
+    <p style="padding:12px 16px 4px;font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;">CHOOSE LANGUAGE / ZA'BI HARSHE</p>
+    <div class="lang-pick">
+      <div class="lpick sel" onclick="setVLang(this,'ha','Hausa','Sannu da zuwa YobeCare! Tambaya game da lafiya, ciwon jiki, ko wuraren asibiti a Jihar Yobe. Zan taimaka da Hausa, Kanuri, Fulfulde, ko Turanci.')">
+        <span class="lfl">🗣</span><div class="ln">Hausa</div><div class="ls">هَوُسَ</div>
+      </div>
+      <div class="lpick" onclick="setVLang(this,'ka','Kanuri','Yerwa YobeCare! Ngata lafiyar, ngata asibiti Jihar Yobe. Kanuri, Hausa, Fulfulde, Turanci ngata.')">
+        <span class="lfl">🌍</span><div class="ln">Kanuri</div><div class="ls">Kānùrī</div>
+      </div>
+      <div class="lpick" onclick="setVLang(this,'fu','Fulfulde','Jam weloo e YobeCare! Ndaari ko dow cellal, duɗal, walla hospiteeji e Yobe. Mi haɗii Fulfulde, Hausa, Kanuri, Engel.')">
+        <span class="lfl">🗣</span><div class="ln">Fulfulde</div><div class="ls">Fula</div>
+      </div>
+      <div class="lpick" onclick="setVLang(this,'en','English','Welcome to YobeCare! Ask about health, symptoms, or hospitals in Yobe State. I can assist in Hausa, Kanuri, Fulfulde, or English.')">
+        <span class="lfl">🇬🇧</span><div class="ln">English</div><div class="ls">English</div>
+      </div>
+    </div>
+
+    <div class="greeting-box">
+      <div class="ghand">🤝</div>
+      <h3 id="vgreeting-title">Sannu da zuwa YobeCare!</h3>
+      <p id="vgreeting-text">Tambaya game da lafiya, ciwon jiki, ko wuraren asibiti a Jihar Yobe. Zan taimaka da Hausa, Kanuri, Fulfulde, ko Turanci.</p>
+    </div>
+
+    <div class="orb-wrap">
+      <div class="orb" id="vorb" onclick="toggleVoice()">
+        <span id="vorb-icon">🎙️</span>
+      </div>
+      <div class="wave-row" id="vwave" style="display:none;">
+        <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
+        <div class="wb"></div><div class="wb"></div><div class="wb"></div>
+      </div>
+      <p class="orb-status" id="vorb-status">Tap to Speak</p>
+    </div>
+
+    <div class="transcript-box" id="vtranscript">
+      <span style="color:rgba(255,255,255,.35);font-size:13px;">Your conversation will appear here…</span>
+    </div>
+
+    <div class="suggestions">
+      <p class="sug-title">Try saying…</p>
+      <span class="sug-chip" onclick="runQuery('fever_hausa')">🤒 Ina jin zafi a ciki</span>
+      <span class="sug-chip" onclick="runQuery('child_fever')">👶 Yarina tana zazzabi</span>
+      <span class="sug-chip" onclick="runQuery('hospital')">🏥 Nearest hospital to me</span>
+      <span class="sug-chip" onclick="runQuery('malaria')">🦟 Malaria symptoms</span>
+      <span class="sug-chip" onclick="runQuery('book')">📅 Book appointment</span>
+      <span class="sug-chip" onclick="runQuery('cholera')">💧 Cholera first aid</span>
+      <span class="sug-chip" onclick="runQuery('kanuri')">🗣 Yara ciwo ce (Kanuri)</span>
+      <span class="sug-chip" onclick="runQuery('maternal')">🤰 Pregnancy tips</span>
+    </div>
+  </div>
+
+  <nav class="bnav">
+    <button class="bni" onclick="goTo('home')"><span class="icon">🏠</span>Home</button>
+    <button class="bni" onclick="goTo('facilities-screen')"><span class="icon">🗺️</span>Facilities</button>
+    <button class="bni active"><span class="icon">🎙️</span>Voice</button>
+    <button class="bni" onclick="goTo('consult-screen')"><span class="icon">📱</span>Consult</button>
+    <button class="bni" onclick="goTo('maternal-screen')"><span class="icon">🤰</span>Maternal</button>
+    <button class="bni" onclick="goTo('alerts-screen')"><span class="icon">🚨</span>Alerts</button>
+    <button class="bni" onclick="goTo('profile-screen')"><span class="icon">👤</span>Profile</button>
+  </nav>
+</div>
+
+<!-- ═══════ CONSULT SCREEN ═══════ -->
+<div class="screen" id="consult-screen">
+  <div class="consult-hero">
+    <button class="back" onclick="goTo('home')">← Back</button>
+    <h2>Telemedicine</h2>
+    <p>Consult a doctor from anywhere in Yobe</p>
+  </div>
+  <div class="scroll">
+    <div class="start-vid-card">
+      <span style="font-size:32px;">📹</span>
+      <div class="svc-text">
+        <h4>Book a Doctor — WhatsApp</h4>
+        <p>Request a consultation — sent instantly</p>
+      </div>
+      <button class="svc-btn" onclick="showModal('book-modal')">Book Now</button>
+    </div>
+
+    <p class="sec-title" style="padding-top:16px;">Available Doctors</p>
+    <div class="doc-list">
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#EFF6FF;">👨‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Ibrahim Mele</h5>
+          <p>General Physician · Yobe Specialist Hospital, Damaturu</p>
+          <div class="doc-status green">● Available Now</div>
+        </div>
+        <button class="consult-btn green" onclick="bookDoc('Dr. Ibrahim Mele','General Physician','Damaturu')">Book</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#FFF0F6;">👩‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Aisha Garba</h5>
+          <p>Obstetrician / Gynaecologist · Specialist Hospital, Potiskum</p>
+          <div class="doc-status green">● Available Now</div>
+        </div>
+        <button class="consult-btn green" onclick="bookDoc('Dr. Aisha Garba','Obstetrician','Potiskum')">Book</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#F0FDF4;">👨‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Suleiman Baka</h5>
+          <p>Paediatrician · Specialist Hospital, Gashua</p>
+          <div class="doc-status gold">● In 15 mins</div>
+        </div>
+        <button class="consult-btn outline" onclick="bookDoc('Dr. Suleiman Baka','Paediatrician','Gashua')">Book</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#FFFBEB;">👩‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Hauwa Musa</h5>
+          <p>General Physician · General Hospital, Nguru</p>
+          <div class="doc-status green">● Available Now</div>
+        </div>
+        <button class="consult-btn green" onclick="bookDoc('Dr. Hauwa Musa','General Physician','Nguru')">Book</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#F0FDF4;">👨‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Musa Geidam</h5>
+          <p>Public Health Physician · Specialist Hospital, Geidam</p>
+          <div class="doc-status green">● Available Now</div>
+        </div>
+        <button class="consult-btn green" onclick="bookDoc('Dr. Musa Geidam','Public Health','Geidam')">Book</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#FFF0F6;">👩‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Fatima Bukar</h5>
+          <p>Surgeon · Federal Medical Centre, Damaturu</p>
+          <div class="doc-status green">● Available Now</div>
+        </div>
+        <button class="consult-btn green" onclick="bookDoc('Dr. Fatima Bukar','Surgeon','Damaturu')">Book</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#EFF6FF;">👨‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Abubakar Yerima</h5>
+          <p>Rheumatologist · FMC Damaturu · HMB Executive Secretary</p>
+          <div class="doc-status gold">● In 30 mins</div>
+        </div>
+        <button class="consult-btn outline" onclick="showToast('Appointment booked!')">Book</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#F0FDF4;">👨‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Usman Jakusko</h5>
+          <p>Internal Medicine · General Hospital, Jakusko</p>
+          <div class="doc-status green">● Available Now</div>
+        </div>
+        <button class="consult-btn green" onclick="startVideoCall('Dr. Usman Jakusko')">Consult</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#FFFBEB;">👩‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Zainab Potiskum</h5>
+          <p>Paediatrician · Specialist Hospital, Potiskum</p>
+          <div class="doc-status green">● Available Now</div>
+        </div>
+        <button class="consult-btn green" onclick="startVideoCall('Dr. Zainab Potiskum')">Consult</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#FFF0F6;">👩‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Maryam Nguru</h5>
+          <p>Midwife / MCH Specialist · General Hospital, Nguru</p>
+          <div class="doc-status green">● Available Now</div>
+        </div>
+        <button class="consult-btn green" onclick="startVideoCall('Dr. Maryam Nguru')">Consult</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#EFF6FF;">👨‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Lawan Gana</h5>
+          <p>Public Health · Ministry of Health, Damaturu</p>
+          <div class="doc-status gold">● In 1 hour</div>
+        </div>
+        <button class="consult-btn outline" onclick="showToast('Appointment booked!')">Book</button>
+      </div>
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:#F0FDF4;">👨‍⚕️</div>
+        <div class="doc-info">
+          <h5>Dr. Adamu Yunusari</h5>
+          <p>General Physician · General Hospital, Yunusari</p>
+          <div class="doc-status green">● Available Now</div>
+        </div>
+        <button class="consult-btn green" onclick="startVideoCall('Dr. Adamu Yunusari')">Consult</button>
+      </div>
+    </div>
+  </div>
+  <nav class="bnav">
+    <button class="bni" onclick="goTo('home')"><span class="icon">🏠</span>Home</button>
+    <button class="bni" onclick="goTo('facilities-screen')"><span class="icon">🗺️</span>Facilities</button>
+    <button class="bni" onclick="goTo('voice-screen')"><span class="icon">🎙️</span>Voice</button>
+    <button class="bni active"><span class="icon">📱</span>Consult</button>
+    <button class="bni" onclick="goTo('maternal-screen')"><span class="icon">🤰</span>Maternal</button>
+    <button class="bni" onclick="goTo('alerts-screen')"><span class="icon">🚨</span>Alerts</button>
+    <button class="bni" onclick="goTo('profile-screen')"><span class="icon">👤</span>Profile</button>
+  </nav>
+</div>
+
+<!-- VIDEO CALL SCREEN -->
+<div class="screen" id="video-call">
+  <div class="video-wrap">
+    <div class="doc-video" id="doc-video">
+      <div class="live-pill"><span class="ldot"></span><span id="live-label">Calling…</span></div>
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+        <div class="ring-wrap"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
+        <div class="doc-vid-ava" id="doc-vid-icon">👨‍⚕️</div>
+      </div>
+      <div style="background:rgba(0,0,0,.5);padding:6px 18px;border-radius:20px;color:#fff;font-size:14px;font-weight:700;" id="doc-call-name">Dr. Ibrahim Mele</div>
+      <div class="call-status-text" id="call-stat">Connecting…</div>
+      <div class="call-timer-text" id="ctimer" style="display:none;">00:00</div>
+      <div class="self-vid">🙂</div>
+      <div class="connecting-ov" id="conn-ov">
+        <div class="spin"></div>
+        <p style="color:rgba(255,255,255,.7);font-size:13px;">Establishing secure connection…</p>
+      </div>
+    </div>
+  </div>
+  <div style="background:#fff;padding:14px 16px;border-bottom:1px solid var(--border);">
+    <p style="font-size:12px;color:var(--muted);">🔒 End-to-end encrypted · Yobe State Health Network</p>
+  </div>
+  <div class="vid-ctrls">
+    <button class="vbtn dark" id="vmute" onclick="toggleVBtn(this,'vmute','🎙️','🔇')">🎙️<span>Mute</span></button>
+    <button class="vbtn dark" id="vcam" onclick="toggleVBtn(this,'vcam','📹','🚫')">📹<span>Video</span></button>
+    <button class="vbtn end" onclick="endCall()">📵<span style="font-size:8px;color:rgba(255,255,255,.8);">End</span></button>
+    <button class="vbtn dark" onclick="showModal('chat-modal')">💬<span>Chat</span></button>
+    <button class="vbtn dark" onclick="showModal('rx-modal')">💊<span>Rx</span></button>
+  </div>
+</div>
+
+<!-- ═══════ FACILITIES ═══════ -->
+<div class="screen" id="facilities-screen">
+  <div class="fac-hero">
+    <button class="back" onclick="goTo('home')">← Back</button>
+    <h2>🏥 Health Facilities</h2>
+    <p>Hospitals & clinics across Yobe State</p>
+  </div>
+  <div style="padding:12px 16px;background:var(--white);border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;">
+    <span>🔍</span>
+    <input type="text" placeholder="Search hospitals in Yobe…" style="flex:1;border:none;background:none;font-family:'Sora',sans-serif;font-size:14px;outline:none;color:var(--text);">
+  </div>
+  <div class="scroll">
+    <div class="map-box" id="mapbox">
+      <div class="yobe-shape"></div>
+
+      <!-- Damaturu cluster -->
+      <div class="mpin g" style="top:47%;left:54%;" onclick="showFac('Yobe State Specialist Hospital','Damaturu','2.1km','Emergency 24hrs · Surgery · ICU · Paediatrics · Maternity')"><div class="mpin-label">Specialist</div>🏥</div>
+      <div class="mpin p" style="top:44%;left:58%;background:rgba(124,58,237,.9);box-shadow:0 0 16px rgba(124,58,237,.7);" onclick="showFac('Federal Medical Centre Damaturu','Damaturu','3.2km','Tertiary care · All specialties · Teaching hospital · Emergency 24hrs')"><div class="mpin-label">FMC</div>🏥</div>
+
+      <!-- Potiskum -->
+      <div class="mpin g" style="top:68%;left:22%;" onclick="showFac('Specialist Hospital Potiskum','Potiskum','98km','Emergency · Surgery · Baby Care Unit · Isolation Centre · Dialysis')"><div class="mpin-label">Potiskum</div>🏥</div>
+
+      <!-- Gashua / Bade -->
+      <div class="mpin g" style="top:14%;left:26%;" onclick="showFac('Specialist Hospital Gashua','Bade LGA','185km','Emergency · Surgery · Special Baby Care Unit · ICU · Isolation Centre')"><div class="mpin-label">Gashua</div>🏥</div>
+
+      <!-- Geidam -->
+      <div class="mpin g" style="top:12%;left:68%;" onclick="showFac('Specialist Hospital Geidam','Geidam LGA','174km','Emergency · Surgery · Maternity · Isolation Centre · Specialist OPD')"><div class="mpin-label">Geidam</div>🏥</div>
+
+      <!-- Nguru -->
+      <div class="mpin r" style="top:16%;left:6%;" onclick="showFac('General Hospital Nguru','Nguru LGA','160km','General OPD · Maternity · Emergency · Lab · Pharmacy')"><div class="mpin-label">Nguru</div>🏥</div>
+
+      <!-- Buni Yadi / Gujba -->
+      <div class="mpin r" style="top:50%;left:76%;" onclick="showFac('General Hospital Buni Yadi','Gujba LGA','48km','General OPD · Maternity · Emergency · Surgery')"><div class="mpin-label">Gujba</div>🏥</div>
+
+      <!-- Jakusko -->
+      <div class="mpin r" style="top:26%;left:14%;" onclick="showFac('General Hospital Jakusko','Jakusko LGA','130km','General OPD · Maternity · Lab · Pharmacy')"><div class="mpin-label">Jakusko</div>🏥</div>
+
+      <!-- Nangere -->
+      <div class="mpin r" style="top:58%;left:32%;" onclick="showFac('General Hospital Nangere','Nangere LGA','75km','General OPD · Maternity · Emergency')"><div class="mpin-label">Nangere</div>🏥</div>
+
+      <!-- Gulani -->
+      <div class="mpin r" style="top:72%;left:78%;" onclick="showFac('General Hospital Gulani','Gulani LGA','82km','General OPD · Maternity · Lab')"><div class="mpin-label">Gulani</div>🏥</div>
+
+      <!-- Fika -->
+      <div class="mpin r" style="top:76%;left:50%;" onclick="showFac('General Hospital Fika','Fika LGA','55km','General OPD · Maternity · Lab · Pharmacy')"><div class="mpin-label">Fika</div>🏥</div>
+
+      <!-- Yunusari -->
+      <div class="mpin r" style="top:8%;left:44%;" onclick="showFac('General Hospital Yunusari','Yunusari LGA','200km','General OPD · Maternity · Isolation Centre · Lab')"><div class="mpin-label">Yunusari</div>🏥</div>
+
+      <!-- PHC pins -->
+      <div class="mpin o" style="top:35%;left:48%;" onclick="showFac('PHC Damaturu Central','Damaturu','1.8km','Immunisation · MCH · Family planning · ORS · ANC')"><div class="mpin-label">PHC</div>🏪</div>
+      <div class="mpin o" style="top:20%;left:38%;" onclick="showFac('PHC Karasuwa','Karasuwa LGA','148km','Immunisation · MCH · Family planning · ANC')"><div class="mpin-label">Karasuwa</div>🏪</div>
+      <div class="mpin o" style="top:32%;left:18%;" onclick="showFac('PHC Bursari','Bursari LGA','105km','Immunisation · MCH · Oral Rehydration · ANC')"><div class="mpin-label">Bursari</div>🏪</div>
+      <div class="mpin o" style="top:60%;left:62%;" onclick="showFac('PHC Tarmuwa','Tarmuwa LGA','60km','Immunisation · MCH · ANC · ORS')"><div class="mpin-label">Tarmuwa</div>🏪</div>
+
+      <!-- You are here -->
+      <div class="you-dot" style="top:50%;left:57%;"></div>
+
+      <div class="map-legend">
+        <div class="mleg"><div class="mleg-dot" style="background:rgba(13,123,107,.9);"></div>Specialist</div>
+        <div class="mleg"><div class="mleg-dot" style="background:rgba(124,58,237,.9);"></div>Federal</div>
+        <div class="mleg"><div class="mleg-dot" style="background:rgba(220,38,38,.9);"></div>General</div>
+        <div class="mleg"><div class="mleg-dot" style="background:rgba(217,119,6,.9);"></div>PHC/Clinic</div>
+        <div class="mleg"><div class="mleg-dot" style="background:#F59E0B;border:2px solid #fff;"></div>You are here</div>
+      </div>
+      <button class="gps-fab" id="gpsbtn" onclick="locateMe()">📡</button>
+    </div>
+
+    <p class="sec-title" style="padding-top:4px;">All Facilities — 17 LGAs</p>
+    <div class="fac-cards">
+      <div class="fac-card2" onclick="showFac('Yobe State Specialist Hospital','Damaturu','2.1km','Emergency 24hrs · Surgery · ICU · Paediatrics · Maternity')">
+        <div class="fac-ico" style="background:#EFF6FF;">🔵</div>
+        <div class="fac-inf"><h5>Yobe State Specialist Hospital</h5><p>Damaturu · All departments</p></div>
+        <div class="fac-dist"><div class="fac-km">2.1 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('Federal Medical Centre Damaturu','Damaturu','3.2km','Tertiary care · All specialties · Teaching hospital · Emergency 24hrs')">
+        <div class="fac-ico" style="background:#F5F0FF;">🟣</div>
+        <div class="fac-inf"><h5>Federal Medical Centre Damaturu</h5><p>Damaturu · Tertiary / Teaching</p></div>
+        <div class="fac-dist"><div class="fac-km">3.2 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('PHC Damaturu Central','Damaturu','1.8km','Immunisation · MCH · Family planning · ORS · ANC')">
+        <div class="fac-ico" style="background:#FFFBEB;">🟠</div>
+        <div class="fac-inf"><h5>PHC Damaturu Central</h5><p>Damaturu · Primary Health Care</p></div>
+        <div class="fac-dist"><div class="fac-km">1.8 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('Specialist Hospital Potiskum','Potiskum LGA','98km','Emergency · Surgery · Baby Care Unit · Isolation Centre · Dialysis')">
+        <div class="fac-ico" style="background:#EFF6FF;">🔵</div>
+        <div class="fac-inf"><h5>Specialist Hospital Potiskum</h5><p>Potiskum LGA · Specialist</p></div>
+        <div class="fac-dist"><div class="fac-km">98 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('Specialist Hospital Gashua','Bade LGA','185km','Emergency · Surgery · Special Baby Care Unit · ICU')">
+        <div class="fac-ico" style="background:#EFF6FF;">🔵</div>
+        <div class="fac-inf"><h5>Specialist Hospital Gashua</h5><p>Bade LGA · Specialist</p></div>
+        <div class="fac-dist"><div class="fac-km">185 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('Specialist Hospital Geidam','Geidam LGA','174km','Emergency · Surgery · Maternity · Isolation Centre · Specialist OPD')">
+        <div class="fac-ico" style="background:#EFF6FF;">🔵</div>
+        <div class="fac-inf"><h5>Specialist Hospital Geidam</h5><p>Geidam LGA · Specialist</p></div>
+        <div class="fac-dist"><div class="fac-km">174 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('General Hospital Nguru','Nguru LGA','160km','General OPD · Maternity · Emergency · Lab · Pharmacy')">
+        <div class="fac-ico" style="background:#F0FDF4;">🟢</div>
+        <div class="fac-inf"><h5>General Hospital Nguru</h5><p>Nguru LGA · General</p></div>
+        <div class="fac-dist"><div class="fac-km">160 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('General Hospital Buni Yadi','Gujba LGA','48km','General OPD · Maternity · Emergency · Surgery')">
+        <div class="fac-ico" style="background:#F0FDF4;">🟢</div>
+        <div class="fac-inf"><h5>General Hospital Buni Yadi</h5><p>Gujba LGA · General</p></div>
+        <div class="fac-dist"><div class="fac-km">48 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('General Hospital Jakusko','Jakusko LGA','130km','General OPD · Maternity · Lab · Pharmacy')">
+        <div class="fac-ico" style="background:#F0FDF4;">🟢</div>
+        <div class="fac-inf"><h5>General Hospital Jakusko</h5><p>Jakusko LGA · General</p></div>
+        <div class="fac-dist"><div class="fac-km">130 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('General Hospital Nangere','Nangere LGA','75km','General OPD · Maternity · Emergency')">
+        <div class="fac-ico" style="background:#F0FDF4;">🟢</div>
+        <div class="fac-inf"><h5>General Hospital Nangere</h5><p>Nangere LGA · General</p></div>
+        <div class="fac-dist"><div class="fac-km">75 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('General Hospital Gulani','Gulani LGA','82km','General OPD · Maternity · Lab')">
+        <div class="fac-ico" style="background:#F0FDF4;">🟢</div>
+        <div class="fac-inf"><h5>General Hospital Gulani</h5><p>Gulani LGA · General</p></div>
+        <div class="fac-dist"><div class="fac-km">82 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('General Hospital Fika','Fika LGA','55km','General OPD · Maternity · Lab · Pharmacy')">
+        <div class="fac-ico" style="background:#F0FDF4;">🟢</div>
+        <div class="fac-inf"><h5>General Hospital Fika</h5><p>Fika LGA · General</p></div>
+        <div class="fac-dist"><div class="fac-km">55 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('General Hospital Yunusari','Yunusari LGA','200km','General OPD · Maternity · Isolation Centre · Lab')">
+        <div class="fac-ico" style="background:#F0FDF4;">🟢</div>
+        <div class="fac-inf"><h5>General Hospital Yunusari</h5><p>Yunusari LGA · General</p></div>
+        <div class="fac-dist"><div class="fac-km">200 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('General Hospital Machina','Machina LGA','210km','General OPD · Maternity · PHC services · Lab')">
+        <div class="fac-ico" style="background:#F0FDF4;">🟢</div>
+        <div class="fac-inf"><h5>General Hospital Machina</h5><p>Machina LGA · General</p></div>
+        <div class="fac-dist"><div class="fac-km">210 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('General Hospital Yusufari','Yusufari LGA','195km','General OPD · Maternity · Emergency · Lab')">
+        <div class="fac-ico" style="background:#F0FDF4;">🟢</div>
+        <div class="fac-inf"><h5>General Hospital Yusufari</h5><p>Yusufari LGA · General</p></div>
+        <div class="fac-dist"><div class="fac-km">195 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('PHC Karasuwa','Karasuwa LGA','148km','Immunisation · MCH · Family planning · ANC')">
+        <div class="fac-ico" style="background:#FFFBEB;">🟠</div>
+        <div class="fac-inf"><h5>PHC Karasuwa</h5><p>Karasuwa LGA · Primary Health Care</p></div>
+        <div class="fac-dist"><div class="fac-km">148 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('PHC Bursari','Bursari LGA','105km','Immunisation · MCH · Oral Rehydration · ANC')">
+        <div class="fac-ico" style="background:#FFFBEB;">🟠</div>
+        <div class="fac-inf"><h5>PHC Bursari</h5><p>Bursari LGA · Primary Health Care</p></div>
+        <div class="fac-dist"><div class="fac-km">105 km</div><div class="fac-open">● Open</div></div>
+      </div>
+      <div class="fac-card2" onclick="showFac('PHC Tarmuwa','Tarmuwa LGA','60km','Immunisation · MCH · ANC · ORS')">
+        <div class="fac-ico" style="background:#FFFBEB;">🟠</div>
+        <div class="fac-inf"><h5>PHC Tarmuwa</h5><p>Tarmuwa LGA · Primary Health Care</p></div>
+        <div class="fac-dist"><div class="fac-km">60 km</div><div class="fac-open">● Open</div></div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bnav">
+    <button class="bni" onclick="goTo('home')"><span class="icon">🏠</span>Home</button>
+    <button class="bni active"><span class="icon">🗺️</span>Facilities</button>
+    <button class="bni" onclick="goTo('voice-screen')"><span class="icon">🎙️</span>Voice</button>
+    <button class="bni" onclick="goTo('consult-screen')"><span class="icon">📱</span>Consult</button>
+    <button class="bni" onclick="goTo('maternal-screen')"><span class="icon">🤰</span>Maternal</button>
+    <button class="bni" onclick="goTo('alerts-screen')"><span class="icon">🚨</span>Alerts</button>
+    <button class="bni" onclick="goTo('profile-screen')"><span class="icon">👤</span>Profile</button>
+  </nav>
+</div>
+
+<!-- ═══════ MATERNAL ═══════ -->
+<div class="screen" id="maternal-screen">
+  <div class="mat-header">
+    <button class="back" onclick="goTo('home')">← Back</button>
+    <div class="sub">Maternal Care 🤰</div>
+    <h2>Fatima · Week 26</h2>
+  </div>
+  <div class="vital-row">
+    <div class="vital-item"><div class="vi">❤️</div><div class="vv">148 bpm</div><div class="vl">Heartbeat</div></div>
+    <div class="vital-item"><div class="vi">🩸</div><div class="vv">110/70</div><div class="vl">BP</div></div>
+    <div class="vital-item"><div class="vi">💊</div><div class="vv">Day 18</div><div class="vl">Iron</div></div>
+  </div>
+
+  <div class="mat-tabs">
+    <button class="mtab sel" onclick="switchTab(this,'tab-overview')">📋 Overview</button>
+    <button class="mtab" onclick="switchTab(this,'tab-exercise')">🤸‍♀️ Exercise</button>
+    <button class="mtab" onclick="switchTab(this,'tab-nutrition')">🥗 Nutrition</button>
+    <button class="mtab" onclick="switchTab(this,'tab-dos')">✅ Dos & Don'ts</button>
+    <button class="mtab" onclick="switchTab(this,'tab-emergency')">🚨 Emergency</button>
+  </div>
+
+  <div class="scroll" style="padding-bottom:80px;">
+    <!-- OVERVIEW TAB -->
+    <div class="tab-panel active mat-content" id="tab-overview">
+      <div class="prog-card">
+        <div class="prog-label"><span>PREGNANCY PROGRESS</span><span>Week 26 / 40</span></div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:65%;"></div></div>
+        <div class="prog-sub"><span>2nd Trimester</span><span>14 weeks left</span></div>
+      </div>
+      <div class="antenatal-card">
+        <div class="alabel">ANTENATAL VISIT 4TH</div>
+        <h3>March 12, 2026</h3>
+        <p>Damaturu General Hospital 10:00 AM</p>
+        <div class="abadge">8 days</div>
+      </div>
+      <p class="sec-title" style="padding:0 0 8px;">BABY THIS WEEK</p>
+      <div class="info-card" style="border-color:#7C3AED;">
+        <div class="ic-head"><span class="ic-icon">👶</span><h4>Your baby is size of a corn cob!</h4></div>
+        <p>About 35cm and 760g. Eyes are now open. Baby can hear your voice — talk and sing to them!</p>
+      </div>
+      <p class="sec-title" style="padding:8px 0;">THIS WEEK'S TIP</p>
+      <div class="info-card" style="border-color:#A855F7;">
+        <div class="ic-head"><span class="ic-icon">💜</span><h4>Sleep on your left side</h4></div>
+        <p>Improves blood flow to baby. Use a pillow between your knees for comfort.</p>
+      </div>
+      <div class="info-card" style="border-color:#0D7B6B;">
+        <div class="ic-head"><span class="ic-icon">🩺</span><h4>Signs to watch for</h4></div>
+        <p>Visit hospital immediately if you experience: severe headache, blurred vision, swelling in face or hands, or reduced baby movement.</p>
+      </div>
+    </div>
+
+    <!-- EXERCISE TAB -->
+    <div class="tab-panel mat-content" id="tab-exercise">
+      <p style="font-size:13px;color:var(--muted);padding:0 0 12px;line-height:1.6;">Safe exercises for Week 26. Always stop if you feel pain or discomfort.</p>
+      <div class="ex-card">
+        <div class="ex-icon">🚶‍♀️</div>
+        <div class="ex-info"><h5>Walking</h5><p>Low impact, safe all trimesters</p></div>
+        <div class="ex-dur">30 min<br><span style="font-size:10px;color:var(--muted);">Daily</span></div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon">🤸‍♀️</div>
+        <div class="ex-info"><h5>Prenatal Yoga</h5><p>Stretching & breathing exercises</p></div>
+        <div class="ex-dur">20 min<br><span style="font-size:10px;color:var(--muted);">3x/week</span></div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon">🏊‍♀️</div>
+        <div class="ex-info"><h5>Swimming</h5><p>Relieves back pain & swelling</p></div>
+        <div class="ex-dur">20 min<br><span style="font-size:10px;color:var(--muted);">2x/week</span></div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon">🧘‍♀️</div>
+        <div class="ex-info"><h5>Kegel Exercises</h5><p>Strengthens pelvic floor muscles</p></div>
+        <div class="ex-dur">10 min<br><span style="font-size:10px;color:var(--muted);">Daily</span></div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon">💨</div>
+        <div class="ex-info"><h5>Deep Breathing</h5><p>Reduces stress & anxiety</p></div>
+        <div class="ex-dur">5 min<br><span style="font-size:10px;color:var(--muted);">Daily</span></div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon">🦵</div>
+        <div class="ex-info"><h5>Leg Raises</h5><p>Reduces leg swelling & cramps</p></div>
+        <div class="ex-dur">10 min<br><span style="font-size:10px;color:var(--muted);">Daily</span></div>
+      </div>
+      <div style="background:#FEF3C7;border-radius:14px;padding:14px;margin-top:4px;font-size:13px;line-height:1.6;">
+        ⚠️ <b>Avoid:</b> Heavy lifting, contact sports, exercises flat on your back after Week 20, extreme heat.
+      </div>
+    </div>
+
+    <!-- NUTRITION TAB -->
+    <div class="tab-panel mat-content" id="tab-nutrition">
+      <p style="font-size:13px;color:var(--muted);padding:0 0 12px;line-height:1.6;">Essential nutrients for you and baby during Week 26.</p>
+      <div class="nut-card">
+        <h5>🥩 Iron-rich Foods</h5>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Prevents anaemia — common in Yobe</p>
+        <div class="nut-row">
+          <span class="nut-chip">Red meat</span><span class="nut-chip">Liver</span><span class="nut-chip">Beans</span><span class="nut-chip">Spinach</span><span class="nut-chip">Groundnuts</span>
+        </div>
+      </div>
+      <div class="nut-card">
+        <h5>🥛 Calcium Foods</h5>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Builds baby's bones & teeth</p>
+        <div class="nut-row">
+          <span class="nut-chip">Milk</span><span class="nut-chip">Yogurt (fura)</span><span class="nut-chip">Fish</span><span class="nut-chip">Moringa</span><span class="nut-chip">Sesame</span>
+        </div>
+      </div>
+      <div class="nut-card">
+        <h5>🍊 Folic Acid / Vitamin C</h5>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Prevents birth defects</p>
+        <div class="nut-row">
+          <span class="nut-chip">Oranges</span><span class="nut-chip">Tomatoes</span><span class="nut-chip">Leafy greens</span><span class="nut-chip">Mango</span>
+        </div>
+      </div>
+      <div class="nut-card">
+        <h5>🌾 Energy Foods</h5>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Sustains energy throughout the day</p>
+        <div class="nut-row">
+          <span class="nut-chip">Millet (gero)</span><span class="nut-chip">Sorghum</span><span class="nut-chip">Yam</span><span class="nut-chip">Sweet potato</span>
+        </div>
+      </div>
+      <div class="nut-card">
+        <h5>💧 Hydration</h5>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Drink at least 8–10 cups of clean water daily</p>
+        <div class="nut-row">
+          <span class="nut-chip">Clean water</span><span class="nut-chip">Kunu</span><span class="nut-chip">Zobo (light)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOS & DON'TS TAB -->
+    <div class="tab-panel mat-content" id="tab-dos">
+      <div class="dos-card">
+        <h5 style="font-size:13px;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;">✅ DO These</h5>
+        <div class="dos-item"><span class="dos-icon">✅</span><span class="dos-text good">Attend all antenatal visits at the hospital</span></div>
+        <div class="dos-item"><span class="dos-icon">✅</span><span class="dos-text good">Take iron and folic acid tablets daily</span></div>
+        <div class="dos-item"><span class="dos-icon">✅</span><span class="dos-text good">Sleep on your left side to improve blood flow</span></div>
+        <div class="dos-item"><span class="dos-icon">✅</span><span class="dos-text good">Drink 8–10 cups of clean water daily</span></div>
+        <div class="dos-item"><span class="dos-icon">✅</span><span class="dos-text good">Use insecticide-treated bed nets (malaria prevention)</span></div>
+        <div class="dos-item"><span class="dos-icon">✅</span><span class="dos-text good">Wash hands before eating and after toilet</span></div>
+        <div class="dos-item"><span class="dos-icon">✅</span><span class="dos-text good">Do light exercise like walking 30 mins daily</span></div>
+        <div class="dos-item"><span class="dos-icon">✅</span><span class="dos-text good">Get tetanus injection as scheduled</span></div>
+      </div>
+      <div class="dos-card" style="margin-top:0;">
+        <h5 style="font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;">❌ DON'T Do These</h5>
+        <div class="dos-item"><span class="dos-icon">❌</span><span class="dos-text bad">Don't take any medication without doctor's advice</span></div>
+        <div class="dos-item"><span class="dos-icon">❌</span><span class="dos-text bad">Don't carry heavy loads or do strenuous work</span></div>
+        <div class="dos-item"><span class="dos-icon">❌</span><span class="dos-text bad">Don't smoke or inhale smoke near others</span></div>
+        <div class="dos-item"><span class="dos-icon">❌</span><span class="dos-text bad">Don't skip meals — baby needs nutrition 3x daily</span></div>
+        <div class="dos-item"><span class="dos-icon">❌</span><span class="dos-text bad">Don't ignore warning signs like heavy bleeding</span></div>
+        <div class="dos-item"><span class="dos-icon">❌</span><span class="dos-text bad">Don't deliver at home — go to hospital for delivery</span></div>
+        <div class="dos-item"><span class="dos-icon">❌</span><span class="dos-text bad">Don't drink alcohol or traditional brews</span></div>
+      </div>
+    </div>
+
+    <!-- EMERGENCY TAB -->
+    <div class="tab-panel mat-content" id="tab-emergency">
+      <div style="background:var(--red);border-radius:16px;padding:16px;margin-bottom:14px;color:#fff;">
+        <h4 style="font-size:16px;font-weight:800;margin-bottom:6px;">⚠️ Go to hospital IMMEDIATELY if you have:</h4>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;opacity:.95;">
+          <span>🔴 Heavy vaginal bleeding</span>
+          <span>🔴 Severe headache or blurred vision</span>
+          <span>🔴 Face, hands or feet severely swollen</span>
+          <span>🔴 Baby not moving for 12+ hours</span>
+          <span>🔴 High fever above 38°C</span>
+          <span>🔴 Severe stomach pains or cramps</span>
+          <span>🔴 Fits/convulsions (eclampsia)</span>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;">
+        <h5 style="font-size:14px;font-weight:700;margin-bottom:10px;">📞 Emergency Contacts — Yobe State</h5>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;"><span>Yobe State Ambulance</span><span style="color:var(--teal);font-weight:700;">0800-YOBE-911</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>SMOH Damaturu</span><span style="color:var(--teal);font-weight:700;">076-323-456</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>FMC Damaturu</span><span style="color:var(--teal);font-weight:700;">076-312-100</span></div>
+        </div>
+      </div>
+      <button class="modal-btn teal" onclick="goTo('consult-screen')">📹 Call a Doctor Now</button>
+    </div>
+  </div>
+
+  <nav class="bnav">
+    <button class="bni" onclick="goTo('home')"><span class="icon">🏠</span>Home</button>
+    <button class="bni" onclick="goTo('facilities-screen')"><span class="icon">🗺️</span>Facilities</button>
+    <button class="bni" onclick="goTo('voice-screen')"><span class="icon">🎙️</span>Voice</button>
+    <button class="bni" onclick="goTo('consult-screen')"><span class="icon">📱</span>Consult</button>
+    <button class="bni active"><span class="icon">🤰</span>Maternal</button>
+    <button class="bni" onclick="goTo('alerts-screen')"><span class="icon">🚨</span>Alerts</button>
+    <button class="bni" onclick="goTo('profile-screen')"><span class="icon">👤</span>Profile</button>
+  </nav>
+</div>
+
+<!-- ═══════ ALERTS SCREEN ═══════ -->
+<div class="screen" id="alerts-screen">
+  <div class="alert-hero">
+    <button class="back" onclick="goTo('home')">← Back</button>
+    <h2>🚨 Disease Alerts & First Aid</h2>
+    <p>20 diseases · Tap any to see Symptoms & First Aid</p>
+  </div>
+  <div class="scroll">
+    <div class="alert-level-banner">
+      <div class="alb-top">
+        <span class="alb-icon">⚠️</span>
+        <div class="alb-text"><h4>Alert Level: HIGH</h4><p>4 high-risk diseases active in Yobe State</p></div>
+      </div>
+      <div class="alb-bar-bg"><div class="alb-bar"></div></div>
+      <div class="alb-meta"><span>Updated: Today 8:30 AM</span><span>All 17 LGAs</span></div>
+    </div>
+
+    <!-- Disease Cards -->
+    <div id="disease-list"></div>
+
+    <!-- AI Health Q&A -->
+    <div style="margin:8px 16px 0;background:#fff;border-radius:16px;border:1.5px solid var(--teal);overflow:hidden;">
+      <div style="background:var(--teal);padding:14px 16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:22px;">🤖</span>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:#fff;">Ask the Health AI</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Powered by Claude AI · Hausa · English</div>
+        </div>
+      </div>
+      <div id="ai-chat-box" style="padding:12px;max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+        <div style="background:#f0fdf4;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);line-height:1.5;border-left:3px solid var(--teal);">
+          👋 Salama! Ask me anything about symptoms, first aid, or diseases in Yobe State — in English or Hausa.
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);">
+        <input id="ai-q-input" type="text" placeholder="e.g. symptoms of cholera, malaria first aid…" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:30px;font-family:'Sora',sans-serif;font-size:13px;outline:none;">
+        <button onclick="askHealthAI()" style="background:var(--teal);border:none;border-radius:50%;width:40px;height:40px;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;">➤</button>
+      </div>
+      <div style="display:flex;gap:6px;padding:0 12px 12px;flex-wrap:wrap;">
+        <span onclick="prefillAI('Cholera symptoms and first aid')" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">💧 Cholera</span>
+        <span onclick="prefillAI('Malaria symptoms and treatment')" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">🦟 Malaria</span>
+        <span onclick="prefillAI('Meningitis symptoms and first aid')" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">🧠 Meningitis</span>
+        <span onclick="prefillAI('Ina jin zafi a ciki - stomach pain first aid in Hausa')" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">🗣 Hausa</span>
+      </div>
+    </div>
+
+    <!-- Report Emergency Banner -->
+    <div style="margin:12px 16px 8px;background:linear-gradient(135deg,#C0392B,#922b21);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;">
+      <span style="font-size:32px;">🛡️</span>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;">Report an Emergency</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.8);">Anonymous · Instant WhatsApp + Email alert</div>
+      </div>
+      <a href="https://yobealert-ng.netlify.app" target="_blank" style="background:#fff;color:#C0392B;font-size:12px;font-weight:800;padding:10px 14px;border-radius:30px;text-decoration:none;white-space:nowrap;">Report Now →</a>
+    </div>
+
+    <div style="height:80px;"></div>
+  </div>
+  <nav class="bnav">
+    <button class="bni" onclick="goTo('home')"><span class="icon">🏠</span>Home</button>
+    <button class="bni" onclick="goTo('facilities-screen')"><span class="icon">🗺️</span>Facilities</button>
+    <button class="bni" onclick="goTo('voice-screen')"><span class="icon">🎙️</span>Voice</button>
+    <button class="bni" onclick="goTo('consult-screen')"><span class="icon">📱</span>Consult</button>
+    <button class="bni" onclick="goTo('maternal-screen')"><span class="icon">🤰</span>Maternal</button>
+    <button class="bni active"><span class="icon">🚨</span>Alerts</button>
+    <button class="bni" onclick="goTo('profile-screen')"><span class="icon">👤</span>Profile</button>
+  </nav>
+</div>
+
+<!-- ═══════ MODALS ═══════ -->
+<div class="modal-bg" id="sos-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('sos-modal')">✕</button>
+    <h3>🚨 Emergency SOS</h3>
+    <p>Your GPS location is being shared with emergency responders in Yobe State. Help is on the way.</p>
+    <div style="background:#FEF2F2;border:1.5px solid var(--red);border-radius:12px;padding:14px;margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--red);font-weight:700;">📍 Location: Damaturu, Yobe State</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">Nearest facility: Yobe State Specialist Hospital · 2.1km</div>
+    </div>
+    <a href="tel:199" class="modal-btn red" style="text-decoration:none;display:block;text-align:center;margin-bottom:8px;">📞 Call Police — 199</a>
+    <a href="tel:112" class="modal-btn red" style="text-decoration:none;display:block;text-align:center;margin-bottom:8px;">🚑 Call NEMA — 112</a>
+    <a href="https://yobealert-ng.netlify.app" target="_blank" class="modal-btn teal" style="text-decoration:none;display:block;text-align:center;margin-bottom:8px;">🛡️ Report on YobeAlert</a>
+    <button class="modal-btn outline" onclick="closeModal('sos-modal')">Cancel SOS</button>
+  </div>
+</div>
+
+<!-- BOOK DOCTOR MODAL -->
+<div class="modal-bg" id="book-modal">
+  <div class="modal" style="max-height:90vh;overflow-y:auto;">
+    <button class="modal-close" onclick="closeModal('book-modal')">✕</button>
+    <h3>📅 Book a Doctor</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Fill this in — your request goes directly to the doctor via WhatsApp.</p>
+    <div id="book-doc-banner" style="background:var(--teal-bg);border:1.5px solid var(--teal);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:700;color:var(--teal);"></div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">Your Name</label>
+      <input id="bk-name" type="text" placeholder="e.g. Fatima Musa" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;outline:none;">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">Phone Number</label>
+      <input id="bk-phone" type="tel" placeholder="08012345678" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;outline:none;">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">LGA</label>
+      <select id="bk-lga" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;outline:none;background:#fff;">
+        <option value="" disabled selected>Select your LGA…</option>
+        <option>Damaturu</option><option>Potiskum</option><option>Gashua (Bade)</option>
+        <option>Geidam</option><option>Nguru</option><option>Gujba</option>
+        <option>Jakusko</option><option>Nangere</option><option>Gulani</option>
+        <option>Fika</option><option>Yunusari</option><option>Machina</option>
+        <option>Yusufari</option><option>Karasuwa</option><option>Bursari</option>
+        <option>Tarmuwa</option><option>Fune</option>
+      </select>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">Describe Your Symptoms</label>
+      <textarea id="bk-symptoms" placeholder="Describe what you are feeling…" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;outline:none;min-height:80px;resize:vertical;"></textarea>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">Preferred Time</label>
+      <select id="bk-time" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;outline:none;background:#fff;">
+        <option value="" disabled selected>Select preferred time…</option>
+        <option>As soon as possible</option>
+        <option>Morning (8AM - 12PM)</option>
+        <option>Afternoon (12PM - 4PM)</option>
+        <option>Evening (4PM - 7PM)</option>
+      </select>
+    </div>
+    <button class="modal-btn teal" onclick="sendBookingWA()" style="margin-bottom:8px;">💬 Send Booking via WhatsApp</button>
+    <button class="modal-btn outline" onclick="closeModal('book-modal')">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="fac-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('fac-modal')">✕</button>
+    <h3 id="fac-m-name">Hospital</h3>
+    <p id="fac-m-info" style="white-space:pre-line;"></p>
+    <div style="margin:12px 0;padding:12px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;">
+      <div style="font-size:12px;color:#065f46;font-weight:700;margin-bottom:4px;">📞 Emergency Line</div>
+      <a id="fac-m-phone" href="tel:199" style="font-size:18px;font-weight:800;color:#0D7B6B;text-decoration:none;">199</a>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <a id="fac-call-btn" href="tel:199" class="modal-btn teal" style="flex:1;text-decoration:none;display:block;text-align:center;">📞 Call Now</a>
+      <a id="fac-dir-btn" href="#" target="_blank" class="modal-btn outline" style="flex:1;text-decoration:none;display:block;text-align:center;" onclick="closeModal('fac-modal')">🗺 Directions</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="chat-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('chat-modal')">✕</button>
+    <h3>💬 In-Call Chat</h3>
+    <div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:12px;">
+      <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:6px;" id="doc-chat-name">Dr. Ibrahim Mele</div>
+      <p style="font-size:13px;line-height:1.6;">Please describe your symptoms clearly. I can see you on camera. What brings you here today?</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <input id="chat-in" type="text" placeholder="Type a message…" style="flex:1;background:#f8fafc;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-size:13px;outline:none;">
+      <button onclick="sendChat()" style="background:var(--teal);border:none;border-radius:12px;padding:12px 16px;color:#fff;font-size:18px;cursor:pointer;">➤</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="rx-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('rx-modal')">✕</button>
+    <h3>💊 Prescription</h3>
+    <div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:16px;">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;" id="rx-doc-name">Issued by Dr. Ibrahim Mele · Today</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:14px;"><span>💊 Amoxicillin 500mg</span><span style="color:var(--teal);">3x daily · 5 days</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;"><span>💊 Paracetamol 500mg</span><span style="color:var(--teal);">2x daily</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;"><span>💊 ORS Sachet</span><span style="color:var(--teal);">As needed</span></div>
+      </div>
+    </div>
+    <button class="modal-btn teal" onclick="closeModal('rx-modal');showToast('✅ Prescription saved to records!')">✅ Save to Health Records</button>
+  </div>
+</div>
+
+<script>
+// ═══ DATA ═══
+var DISEASES = [
+  {name:'Cholera',icon:'💧',level:'high',symptoms:['Sudden severe watery diarrhoea','Vomiting and muscle cramps','Sunken eyes, extreme weakness','Dehydration, low urine output'],firstaid:['Make ORS: 1L water + 6 tsp sugar + half tsp salt. Give every few minutes.','Keep giving fluids even if vomiting continues.','Rush to hospital immediately.'],warning:'Can kill within hours if untreated!'},
+  {name:'Measles',icon:'🔴',level:'high',symptoms:['High fever for 2-4 days','Red rash starting on face, spreading to body','Runny nose, cough, red eyes','White spots inside mouth'],firstaid:['Give Vitamin A supplements immediately.','Sponge bath to reduce fever.','Keep child hydrated. Isolate - very contagious.'],warning:'Can cause blindness or death in children!'},
+  {name:'Meningitis',icon:'🧠',level:'high',symptoms:['Sudden severe headache','Stiff neck - cannot bend chin to chest','High fever, vomiting, confusion','Sensitivity to light, skin rash'],firstaid:['Take to hospital IMMEDIATELY.','Keep patient still and calm.','Do NOT give aspirin.'],warning:'Can cause death within 24 hours - rush to hospital!'},
+  {name:'Diphtheria',icon:'💉',level:'high',symptoms:['Grey coating at back of throat','Sore throat, hoarse voice','Difficulty breathing or swallowing','Swollen neck'],firstaid:['Rush to hospital immediately.','Do NOT try to remove throat coating.','Isolate from family members.'],warning:'Can block airway and cause suffocation!'},
+  {name:'Malaria',icon:'🦟',level:'medium',symptoms:['High fever, chills and shivering','Severe headache and muscle pain','Sweating, vomiting, tiredness','Pale skin, yellowing of eyes'],firstaid:['Give paracetamol. Cool with damp cloth.','Push clean water and ORS.','Go to clinic immediately for blood test and antimalarial drugs.'],warning:'Cerebral malaria can cause coma - do not delay treatment!'},
+  {name:'Typhoid Fever',icon:'🌡️',level:'medium',symptoms:['Prolonged high fever (1-3 weeks)','Headache, weakness, stomach pain','Constipation or diarrhoea','Rose spots on abdomen'],firstaid:['Give paracetamol for fever.','Drink only clean water.','Visit hospital for antibiotic prescription.'],warning:'Can cause intestinal perforation if untreated!'},
+  {name:'Tuberculosis (TB)',icon:'🫁',level:'medium',symptoms:['Persistent cough for 2+ weeks','Coughing blood or bloody mucus','Night sweats, unexplained weight loss','Chest pain, weakness'],firstaid:['Visit hospital immediately for TB test.','Cover mouth when coughing.','Complete 6-month treatment fully.'],warning:'TB is curable - stop treatment early and it becomes resistant!'},
+  {name:'Lassa Fever',icon:'🐀',level:'medium',symptoms:['Gradual onset fever, weakness','Headache, sore throat, muscle pain','Vomiting, diarrhoea, chest pain','Bleeding from nose, mouth or gums'],firstaid:['Isolate patient immediately.','Rush to hospital - report to authorities.','Avoid contact with rats and droppings.'],warning:'Person-to-person transmission possible - isolate immediately!'},
+  {name:'COVID-19',icon:'🦠',level:'medium',symptoms:['Fever, dry cough, tiredness','Loss of taste or smell','Difficulty breathing, chest pain','Runny nose, sore throat'],firstaid:['Isolate at home for 10 days.','Rest, drink fluids, take paracetamol.','Seek hospital if breathing becomes difficult.'],warning:'Protect elderly and those with underlying conditions!'},
+  {name:'Monkey Pox',icon:'🐒',level:'low',symptoms:['Fever, headache, muscle aches','Rash starting on face spreading to body','Blisters filled with fluid','Swollen lymph nodes'],firstaid:['Isolate immediately. Do not pop blisters.','Visit hospital for diagnosis.','Take paracetamol for pain and fever.'],warning:'Contact with infected animals or people spreads monkeypox!'},
+  {name:'Polio',icon:'🦵',level:'low',symptoms:['Fever, sore throat, headache','Neck or back stiffness','Paralysis of limbs in severe cases','Usually affects children under 5'],firstaid:['No cure - prevention is key.','Ensure children receive all polio vaccines.','Report any sudden paralysis in children.'],warning:'Polio causes permanent disability - vaccinate your children!'},
+  {name:'Yellow Fever',icon:'🟡',level:'low',symptoms:['Sudden fever, chills, headache','Muscle pain, nausea, vomiting','Yellowing of skin and eyes','Dark urine, abdominal pain'],firstaid:['Rest and drink plenty of fluids.','Take paracetamol for fever.','Get vaccinated - one dose lasts lifetime.'],warning:'Yellow fever vaccine is the best protection!'},
+  {name:'Diarrhoea',icon:'🚽',level:'medium',symptoms:['Loose watery stools 3+ times a day','Stomach cramps and bloating','Nausea and vomiting','Dehydration - dry mouth, sunken eyes'],firstaid:['Give ORS immediately: 1L water + 6tsp sugar + half tsp salt.','Continue breastfeeding babies.','Give zinc tablets 10 days for children.'],warning:'Diarrhoea is the number 1 killer of children under 5 in Yobe!'},
+  {name:'Pneumonia',icon:'🫁',level:'medium',symptoms:['Fast breathing or difficulty breathing','Cough with mucus or blood','Chest pain when breathing','High fever, shivering, sweating'],firstaid:['Give paracetamol for fever.','Keep child upright to ease breathing.','Go to hospital immediately for antibiotics.'],warning:'Pneumonia is the leading killer of children under 5!'},
+  {name:'Rabies',icon:'🐕',level:'low',symptoms:['Pain at bite site','Fever, headache, confusion','Extreme fear of water','Difficulty swallowing, paralysis'],firstaid:['Wash wound with soap and water for 15 minutes immediately.','Go to hospital within hours for vaccine.','Do NOT wait for symptoms.'],warning:'Rabies is 100% fatal once symptoms appear - act immediately after bite!'},
+  {name:'Scabies',icon:'🦠',level:'low',symptoms:['Intense itching especially at night','Pimple-like rash between fingers','Common on wrists and armpits','Very contagious - spreads by touch'],firstaid:['Apply prescribed scabies cream all over body.','Wash all clothes and bedding in hot water.','All household members must be treated.'],warning:'All family members must be treated or scabies will keep coming back!'},
+  {name:'Conjunctivitis',icon:'👁️',level:'low',symptoms:['Red, itchy, watery eyes','Discharge from eyes especially morning','Swollen eyelids','Very contagious'],firstaid:['Clean eyes with clean wet cloth.','Do NOT share towels or pillowcases.','See doctor for antibiotic eye drops.'],warning:'Apollo spreads very fast - keep away from schools until treated!'},
+  {name:'Anaemia',icon:'🩸',level:'medium',symptoms:['Extreme tiredness and weakness','Pale skin, pale inside eyelids','Shortness of breath, dizziness','Rapid heartbeat, headache'],firstaid:['Eat iron-rich foods: liver, meat, beans, greens.','Take iron supplement tablets daily.','Visit clinic for blood test.'],warning:'Anaemia in pregnancy can cause maternal death - get tested!'},
+  {name:'Hypertension',icon:'💓',level:'medium',symptoms:['Often NO symptoms - silent killer','Headache at back of head','Blurred vision, dizziness','Nosebleeds, shortness of breath'],firstaid:['Reduce salt in food immediately.','Take prescribed blood pressure medication daily.','Visit clinic to monitor blood pressure regularly.'],warning:'High blood pressure causes strokes and heart attacks - check regularly!'},
+  {name:'Malnutrition',icon:'🍽️',level:'medium',symptoms:['Extreme thinness in children','Swollen belly or feet','Hair thinning or colour change','Delayed growth, weakness'],firstaid:['Start high-energy foods immediately.','Give vitamin and mineral supplements.','Visit health centre for therapeutic feeding support.'],warning:'Malnutrition in Yobe affects 1 in 3 children - seek help early!'}
+];
+
+var VOICE_RESPONSES = {
+  fever_hausa: {q:'Ina jin zafi a ciki (I have stomach pain)', r:'AI (Hausa): Yiwuwar ciwon cikin da kuke da shi na iya zama daga cututtuka kamar: kamuwa da bacteria, amai, ko sanyin ciki.\n\nYi haka yanzu:\n1. Sha ruwa mai yawa\n2. Huta, kada ka ci abinci mai ɗaci\n3. Idan ciwon ya tsananta - je asibiti\n\nAsibiti mafi kusa: Yobe State Specialist Hospital, 2.1km'},
+  child_fever: {q:'Yarina tana zazzabi (Child has fever)', r:'AI (Hausa): Zazzabin yaro na iya zama malaria, hanjali, ko typhoid.\n\nYi haka yanzu:\n1. Ka ba ta Paracetamol syrup\n2. Wiperka da danyen tufafi don rage zafi\n3. Sha ruwa koyaushe\n4. JE ASIBITI YANZU - kada ka jinkirta\n\nYara kanana da zazzabi babban hadari ne!'},
+  hospital: {q:'Nearest hospital to me', r:'AI: Nearest health facilities:\n\n1. Yobe State Specialist Hospital\nDamaturu, 2.1km, Open now\n\n2. Federal Medical Centre Damaturu\nDamaturu, 3.2km, Open now\n\n3. PHC Damaturu Central\nDamaturu, 1.8km, Open now\n\nTap the Map tab to get directions!'},
+  malaria: {q:'Malaria symptoms', r:'AI: Malaria symptoms include:\n\nHigh fever with chills and shivering\nSevere headache and muscle pain\nSweating, vomiting, fatigue\nPale skin, yellowing of eyes\n\nFirst Aid:\n1. Give paracetamol for fever\n2. Use damp cloth to cool body\n3. Go to clinic for blood test and antimalarial drugs\n\nCerebral malaria can cause coma - do NOT delay!'},
+  cholera: {q:'Cholera first aid', r:'AI: CHOLERA FIRST AID:\n\n1. Make ORS: 1L water + 6 tsp sugar + half tsp salt. Give small sips every few minutes.\n2. Keep giving fluids even if vomiting\n3. RUSH to hospital immediately\n\nCholera can kill within hours if not treated!\n\nNearest hospital: Yobe State Specialist Hospital, 2.1km'},
+  maternal: {q:'Pregnancy tips for Week 26', r:'AI: Week 26 Pregnancy Tips:\n\nTake iron and folic acid tablets daily\nSleep on your LEFT side\nDrink 8-10 cups of clean water daily\nAttend your antenatal visit on March 12\nUse insecticide bed net for malaria\n\nGo to hospital IMMEDIATELY if:\n- Heavy bleeding\n- Severe headache or blurred vision\n- Baby not moving for 12+ hours\n\nNext visit: March 12, 2026 at Damaturu General Hospital'},
+  kanuri: {q:'Yara ciwo ce (Child is sick - Kanuri)', r:'AI (Kanuri): Yara ciwo ngadai, ngata sabe hospital kul. Paracetamol ngata, ruwa ngata ma chikki. Sabe 24 kul ngata hospital.\n\n[English: The child is sick, take them to hospital now. Give paracetamol, give water regularly. If not better in 24 hours, go to hospital immediately.]\n\nNearest: Yobe State Specialist Hospital, 2.1km'},
+  book: {q:'Book doctor appointment', r:'AI: Booking you with Dr. Aisha Garba (Obstetrician) in Potiskum.\n\nNext available: Tomorrow, 10:00 AM\nPotiskum General Hospital\nVideo consultation available\n\nTap Consult tab to connect now.'}
+};
+
+// ═══ STATE ═══
+var callTimer = null;
+var callSecs = 0;
+var currentDoc = 'Dr. Ibrahim Mele';
+var ttsUtterance = null;
+var ttsLang = 'en';
+var ttsSpeaking = false;
+var voiceOn = false;
+var voOverlayOn = false;
+var currentUser = {name:'Malam Yusuf', phone:'08100000000', lga:'Damaturu', initials:'MY'};
+
+var TTS_VOICE_MAP = {en:'en-NG', ha:'ha-NE', ka:'ha-NE', fu:'ff-Latn'};
+
+// ═══ NAVIGATION ═══
+function goTo(id) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i = 0; i < screens.length; i++) {
+    screens[i].classList.remove('active');
+  }
+  var target = document.getElementById(id);
+  if (target) target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 2500);
+}
+
+// ═══ LANGUAGE ═══
+function selectLang(el, code) {
+  var btns = document.querySelectorAll('.lbtn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('sel');
+  el.classList.add('sel');
+}
+
+// ═══ VOICE SCREEN ═══
+function setVLang(el, code, title, greeting) {
+  var picks = document.querySelectorAll('.lpick');
+  for (var i = 0; i < picks.length; i++) picks[i].classList.remove('sel');
+  el.classList.add('sel');
+  var gt = document.getElementById('vgreeting-title');
+  var gp = document.getElementById('vgreeting-text');
+  if (gt) gt.textContent = title;
+  if (gp) gp.textContent = greeting;
+}
+
+function toggleVoice() {
+  voiceOn = !voiceOn;
+  var orb = document.getElementById('vorb');
+  var wave = document.getElementById('vwave');
+  var status = document.getElementById('vorb-status');
+  var icon = document.getElementById('vorb-icon');
+  if (voiceOn) {
+    if (orb) orb.classList.add('listening');
+    if (wave) wave.style.display = 'flex';
+    if (status) status.textContent = 'Listening...';
+    if (icon) icon.textContent = '🔴';
+    setTimeout(function() {
+      voiceOn = false;
+      if (orb) orb.classList.remove('listening');
+      if (icon) icon.textContent = '🤔';
+      if (status) status.textContent = 'Processing...';
+      if (wave) wave.style.display = 'none';
+      setTimeout(function() {
+        runQuery('malaria');
+        if (status) status.textContent = 'Tap to Speak';
+        if (icon) icon.textContent = '🎙️';
+      }, 1200);
+    }, 2500);
+  } else {
+    if (orb) orb.classList.remove('listening');
+    if (wave) wave.style.display = 'none';
+    if (status) status.textContent = 'Tap to Speak';
+    if (icon) icon.textContent = '🎙️';
+  }
+}
+
+function runQuery(key) {
+  var d = VOICE_RESPONSES[key];
+  if (!d) return;
+  var vt = document.getElementById('vtranscript');
+  if (vt) vt.innerHTML = '<span style="color:#F59E0B;font-size:11px;font-weight:700;">YOU SAID</span><br><span style="font-size:14px;">' + d.q + '</span><br><br><span style="white-space:pre-line;font-size:13px;line-height:1.8;">' + d.r + '</span>';
+}
+
+// ═══ VIDEO CALL ═══
+function startVideoCall(docName) {
+  if (docName) {
+    currentDoc = docName;
+    var dcn = document.getElementById('doc-call-name');
+    var dci = document.getElementById('doc-vid-icon');
+    var dchat = document.getElementById('doc-chat-name');
+    var rxd = document.getElementById('rx-doc-name');
+    if (dcn) dcn.textContent = docName;
+    if (dchat) dchat.textContent = docName;
+    if (rxd) rxd.textContent = 'Issued by ' + docName + ' - Today';
+    var isFemale = (docName.indexOf('Aisha') !== -1 || docName.indexOf('Hauwa') !== -1 || docName.indexOf('Fatima') !== -1 || docName.indexOf('Zainab') !== -1 || docName.indexOf('Maryam') !== -1);
+    if (dci) dci.textContent = isFemale ? '👩‍⚕️' : '👨‍⚕️';
+  }
+  goTo('video-call');
+  callSecs = 0;
+  var ct = document.getElementById('ctimer');
+  var cs = document.getElementById('call-stat');
+  var ll = document.getElementById('live-label');
+  var co = document.getElementById('conn-ov');
+  if (ct) ct.style.display = 'none';
+  if (cs) cs.textContent = 'Connecting...';
+  if (ll) ll.textContent = 'Calling...';
+  if (co) co.style.display = 'flex';
+  if (callTimer) clearInterval(callTimer);
+  setTimeout(function() {
+    if (co) co.style.display = 'none';
+    if (cs) cs.textContent = 'Connected';
+    if (ll) ll.textContent = 'LIVE';
+    if (ct) ct.style.display = 'block';
+    callTimer = setInterval(function() {
+      callSecs++;
+      var m = String(Math.floor(callSecs / 60));
+      var s = String(callSecs % 60);
+      if (m.length < 2) m = '0' + m;
+      if (s.length < 2) s = '0' + s;
+      var el = document.getElementById('ctimer');
+      if (el) el.textContent = m + ':' + s;
+    }, 1000);
+  }, 3000);
+}
+
+function endCall() {
+  if (callTimer) clearInterval(callTimer);
+  goTo('consult-screen');
+}
+
+// ═══ BOOK DOCTOR ═══
+var currentBookDoc = '';
+function bookDoc(name, specialty, location) {
+  currentBookDoc = name;
+  var banner = document.getElementById('book-doc-banner');
+  if (banner) banner.textContent = '👨‍⚕️ ' + name + ' — ' + specialty + ' · ' + location;
+  var nameField = document.getElementById('bk-name');
+  if (nameField && currentUser && currentUser.name) nameField.value = currentUser.name;
+  var phoneField = document.getElementById('bk-phone');
+  if (phoneField && currentUser && currentUser.phone) phoneField.value = currentUser.phone;
+  var lgaField = document.getElementById('bk-lga');
+  if (lgaField && currentUser && currentUser.lga) lgaField.value = currentUser.lga;
+  showModal('book-modal');
+}
+
+function sendBookingWA() {
+  var name = (document.getElementById('bk-name') || {}).value || '';
+  var phone = (document.getElementById('bk-phone') || {}).value || '';
+  var lga = (document.getElementById('bk-lga') || {}).value || '';
+  var symptoms = (document.getElementById('bk-symptoms') || {}).value || '';
+  var time = (document.getElementById('bk-time') || {}).value || '';
+  if (!name || !phone || !lga || !symptoms || !time) {
+    showToast('Please fill in all fields before sending.');
+    return;
+  }
+  var ref = 'YBC-' + Math.floor(100000 + Math.random() * 900000);
+  var msg = 'YobeCare Doctor Booking Request\n'
+    + 'Reference: ' + ref + '\n\n'
+    + 'Doctor Requested: ' + currentBookDoc + '\n'
+    + 'Patient Name: ' + name + '\n'
+    + 'Phone: ' + phone + '\n'
+    + 'LGA: ' + lga + '\n'
+    + 'Preferred Time: ' + time + '\n\n'
+    + 'Symptoms:\n' + symptoms + '\n\n'
+    + 'Sent via YobeCare App';
+  var waUrl = 'https://wa.me/2348137610424?text=' + encodeURIComponent(msg);
+  closeModal('book-modal');
+  window.open(waUrl, '_blank');
+  showToast('✅ Booking sent! Ref: ' + ref);
+}
+
+function toggleVBtn(btn, id, onIcon, offIcon) {
+  btn.classList.toggle('active');
+  var isActive = btn.classList.contains('active');
+  var label = '';
+  if (id === 'vmute') label = isActive ? 'Unmute' : 'Mute';
+  else label = isActive ? 'No Video' : 'Video';
+  btn.innerHTML = (isActive ? offIcon : onIcon) + '<span>' + label + '</span>';
+}
+
+// ═══ FACILITIES ═══
+var FAC_DATA = {
+  'Yobe State Specialist Hospital': { phone: '07034000001', maps: 'https://maps.google.com/?q=Yobe+State+Specialist+Hospital+Damaturu' },
+  'Federal Medical Centre Damaturu': { phone: '07034000002', maps: 'https://maps.google.com/?q=Federal+Medical+Centre+Damaturu' },
+  'Specialist Hospital Potiskum': { phone: '07034000003', maps: 'https://maps.google.com/?q=Specialist+Hospital+Potiskum' },
+  'Specialist Hospital Gashua': { phone: '07034000004', maps: 'https://maps.google.com/?q=Specialist+Hospital+Gashua+Bade' },
+  'Specialist Hospital Geidam': { phone: '07034000005', maps: 'https://maps.google.com/?q=Specialist+Hospital+Geidam' },
+  'General Hospital Nguru': { phone: '07034000006', maps: 'https://maps.google.com/?q=General+Hospital+Nguru+Yobe' },
+  'General Hospital Buni Yadi': { phone: '07034000007', maps: 'https://maps.google.com/?q=General+Hospital+Buni+Yadi+Gujba' },
+  'General Hospital Jakusko': { phone: '07034000008', maps: 'https://maps.google.com/?q=General+Hospital+Jakusko+Yobe' },
+  'General Hospital Nangere': { phone: '07034000009', maps: 'https://maps.google.com/?q=General+Hospital+Nangere+Yobe' },
+  'General Hospital Gulani': { phone: '07034000010', maps: 'https://maps.google.com/?q=General+Hospital+Gulani+Yobe' },
+  'General Hospital Fika': { phone: '07034000011', maps: 'https://maps.google.com/?q=General+Hospital+Fika+Yobe' },
+  'General Hospital Yunusari': { phone: '07034000012', maps: 'https://maps.google.com/?q=General+Hospital+Yunusari+Yobe' },
+  'PHC Damaturu Central': { phone: '199', maps: 'https://maps.google.com/?q=PHC+Damaturu+Central+Yobe' },
+  'PHC Karasuwa': { phone: '199', maps: 'https://maps.google.com/?q=PHC+Karasuwa+Yobe' },
+  'PHC Bursari': { phone: '199', maps: 'https://maps.google.com/?q=PHC+Bursari+Yobe' },
+  'PHC Tarmuwa': { phone: '199', maps: 'https://maps.google.com/?q=PHC+Tarmuwa+Yobe' },
+};
+function locateMe() {
+  var btn = document.getElementById('gpsbtn');
+  if (!btn) return;
+  btn.textContent = '📡';
+  setTimeout(function() {
+    btn.textContent = '✅';
+    showToast('📍 Location found: Damaturu, Yobe');
+    setTimeout(function() { btn.textContent = '📡'; }, 2000);
+  }, 1500);
+}
+
+function showFac(name, lga, dist, info) {
+  var mn = document.getElementById('fac-m-name');
+  var mi = document.getElementById('fac-m-info');
+  var mp = document.getElementById('fac-m-phone');
+  var mcb = document.getElementById('fac-call-btn');
+  var mdb = document.getElementById('fac-dir-btn');
+  var cleanName = name.replace('🏥 ', '');
+  if (mn) mn.textContent = '🏥 ' + cleanName;
+  if (mi) mi.textContent = '📍 ' + lga + ', Yobe State  ·  ' + dist + '\n\n' + info;
+  var fd = FAC_DATA[cleanName] || { phone: '199', maps: 'https://maps.google.com/?q=' + encodeURIComponent(cleanName + ' Yobe State Nigeria') };
+  if (mp) { mp.textContent = fd.phone; mp.href = 'tel:' + fd.phone; }
+  if (mcb) mcb.href = 'tel:' + fd.phone;
+  if (mdb) mdb.href = fd.maps;
+  showModal('fac-modal');
+}
+
+// ═══ MATERNAL TABS ═══
+function switchTab(btn, tabId) {
+  var tabs = document.querySelectorAll('.mtab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('sel');
+  var panels = document.querySelectorAll('.tab-panel');
+  for (var i = 0; i < panels.length; i++) panels[i].classList.remove('active');
+  btn.classList.add('sel');
+  var tp = document.getElementById(tabId);
+  if (tp) tp.classList.add('active');
+}
+
+// ═══ DISEASES ═══
+function buildDiseases() {
+  var container = document.getElementById('disease-list');
+  if (!container) return;
+
+  var picker = document.createElement('div');
+  picker.style.cssText = 'display:flex;gap:8px;padding:10px 16px 4px;align-items:center;flex-wrap:wrap;';
+  picker.innerHTML = '<span style="font-size:11px;font-weight:700;color:var(--muted);">🔊 Read in:</span>' +
+    '<button class="tts-lang-btn active" onclick="setTtsLang(this,\'en\')">🇬🇧 English</button>' +
+    '<button class="tts-lang-btn" onclick="setTtsLang(this,\'ha\')">🗣 Hausa</button>' +
+    '<button class="tts-lang-btn" onclick="setTtsLang(this,\'ka\')">🗣 Kanuri</button>' +
+    '<button class="tts-lang-btn" onclick="setTtsLang(this,\'fu\')">🗣 Fulfulde</button>';
+  container.appendChild(picker);
+
+  for (var i = 0; i < DISEASES.length; i++) {
+    (function(d, idx) {
+      var card = document.createElement('div');
+      card.className = 'disease-card';
+      var sympHtml = '';
+      for (var j = 0; j < d.symptoms.length; j++) sympHtml += '<li>' + d.symptoms[j] + '</li>';
+      var aidHtml = '';
+      for (var j = 0; j < d.firstaid.length; j++) aidHtml += '<li>' + d.firstaid[j] + '</li>';
+      card.innerHTML =
+        '<div class="dc-header" onclick="toggleDisease(' + idx + ')">' +
+          '<span class="dc-icon">' + d.icon + '</span>' +
+          '<div class="dc-name"><h5>' + d.name + '</h5><p>Yobe State</p></div>' +
+          '<span class="dc-badge ' + d.level + '">' + d.level.toUpperCase() + '</span>' +
+          '<span class="dc-toggle" id="dtog-' + idx + '">▼</span>' +
+        '</div>' +
+        '<div class="dc-body" id="dbody-' + idx + '">' +
+          '<div class="dc-section"><h6>🔴 Symptoms:</h6><ul>' + sympHtml + '</ul></div>' +
+          '<div class="dc-section"><h6>🩹 First Aid:</h6><ol>' + aidHtml + '</ol></div>' +
+          '<div class="dc-warning">⚠️ ' + d.warning + '</div>' +
+          '<button class="read-btn" id="rbtn-' + idx + '" onclick="event.stopPropagation();ttsReadDiseaseCard(' + idx + ',this)">🔊 Read Aloud</button>' +
+        '</div>';
+      container.appendChild(card);
+    })(DISEASES[i], i);
+  }
+}
+
+function setTtsLang(btn, lang) {
+  ttsLang = lang;
+  var btns = document.querySelectorAll('.tts-lang-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  btn.classList.add('active');
+  var names = {en:'English', ha:'Hausa', ka:'Kanuri', fu:'Fulfulde'};
+  showToast('🔊 Language: ' + (names[lang] || lang));
+}
+
+function toggleDisease(i) {
+  var body = document.getElementById('dbody-' + i);
+  var tog = document.getElementById('dtog-' + i);
+  if (body) body.classList.toggle('open');
+  if (tog) tog.classList.toggle('open');
+}
+
+function ttsReadDiseaseCard(i, btn) {
+  var d = DISEASES[i];
+  if (!d) return;
+  if (btn.classList.contains('speaking')) { ttsStop(); return; }
+  var btns = document.querySelectorAll('.read-btn');
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].classList.remove('speaking');
+    btns[j].innerHTML = '🔊 Read Aloud';
+  }
+  btn.classList.add('speaking');
+  btn.innerHTML = '🔴 Stop';
+  var text = d.name + '. Symptoms: ' + d.symptoms.join('. ') + '. First Aid: ' + d.firstaid.join('. ') + '. Warning: ' + d.warning;
+  ttsSpeakText(text, ttsLang);
+}
+
+// ═══ SEARCH ═══
+var ALL_RESULTS = [
+  {icon:'👨‍⚕️', title:'Dr. Ibrahim Mele', sub:'General Physician · Damaturu · Available', fn:function(){startVideoCall('Dr. Ibrahim Mele');closeSearch();}},
+  {icon:'👩‍⚕️', title:'Dr. Aisha Garba', sub:'Obstetrician · Potiskum · Available', fn:function(){startVideoCall('Dr. Aisha Garba');closeSearch();}},
+  {icon:'👩‍⚕️', title:'Dr. Hauwa Musa', sub:'General Physician · Nguru · Available', fn:function(){startVideoCall('Dr. Hauwa Musa');closeSearch();}},
+  {icon:'👨‍⚕️', title:'Dr. Suleiman Baka', sub:'Paediatrician · Gashua', fn:function(){goTo('consult-screen');closeSearch();}},
+  {icon:'🏥', title:'Yobe State Specialist Hospital', sub:'Damaturu · 2.1km · Open now', fn:function(){showFac('Yobe State Specialist Hospital','Damaturu','2.1km','Emergency · Surgery · ICU · Paediatrics');closeSearch();}},
+  {icon:'🏨', title:'Federal Medical Centre Damaturu', sub:'Damaturu · 3.2km · Open now', fn:function(){showFac('Federal Medical Centre','Damaturu','3.2km','Tertiary care · All specialties');closeSearch();}},
+  {icon:'🦟', title:'Malaria - symptoms and first aid', sub:'Disease Alerts', fn:function(){goTo('alerts-screen');closeSearch();}},
+  {icon:'💧', title:'Cholera - symptoms and first aid', sub:'Disease Alerts', fn:function(){goTo('alerts-screen');closeSearch();}},
+  {icon:'🧠', title:'Meningitis - symptoms and first aid', sub:'Disease Alerts', fn:function(){goTo('alerts-screen');closeSearch();}},
+  {icon:'🤰', title:'Pregnancy tips - Week 26', sub:'Maternal Care', fn:function(){goTo('maternal-screen');closeSearch();}},
+  {icon:'🥗', title:'Maternal nutrition guide', sub:'Maternal Care', fn:function(){goTo('maternal-screen');closeSearch();}}
+];
+
+function soClick(idx) { if (ALL_RESULTS[idx]) ALL_RESULTS[idx].fn(); }
+
+function openSearch() {
+  document.getElementById('search-overlay').classList.add('open');
+  setTimeout(function() { var el = document.getElementById('so-input'); if (el) el.focus(); }, 100);
+}
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('open');
+  var si = document.getElementById('so-input');
+  if (si) si.value = '';
+  filterSearch('');
+}
+function filterSearch(val) {
+  var body = document.getElementById('so-body');
+  if (!body) return;
+  if (!val || !val.trim()) {
+    body.innerHTML = '<div class="so-section"><h4>Doctors</h4>' +
+      '<div class="so-result" onclick="soClick(0)"><div class="sr-icon">👨‍⚕️</div><div><h5>Dr. Ibrahim Mele</h5><p>General Physician · Damaturu</p></div><span class="sr-arr">→</span></div>' +
+      '<div class="so-result" onclick="soClick(1)"><div class="sr-icon">👩‍⚕️</div><div><h5>Dr. Aisha Garba</h5><p>Obstetrician · Potiskum</p></div><span class="sr-arr">→</span></div>' +
+      '<div class="so-result" onclick="soClick(2)"><div class="sr-icon">👩‍⚕️</div><div><h5>Dr. Hauwa Musa</h5><p>General Physician · Nguru</p></div><span class="sr-arr">→</span></div>' +
+      '</div>' +
+      '<div class="so-section"><h4>Quick Searches</h4>' +
+      '<div class="so-result" onclick="soClick(6)"><div class="sr-icon">🦟</div><div><h5>Malaria symptoms</h5><p>Disease Alerts</p></div><span class="sr-arr">→</span></div>' +
+      '<div class="so-result" onclick="soClick(7)"><div class="sr-icon">💧</div><div><h5>Cholera first aid</h5><p>Disease Alerts</p></div><span class="sr-arr">→</span></div>' +
+      '<div class="so-result" onclick="soClick(9)"><div class="sr-icon">🤰</div><div><h5>Pregnancy tips - Week 26</h5><p>Maternal Care</p></div><span class="sr-arr">→</span></div>' +
+      '</div>';
+    return;
+  }
+  var q = val.toLowerCase();
+  var matches = [];
+  for (var i = 0; i < ALL_RESULTS.length; i++) {
+    var r = ALL_RESULTS[i];
+    if (r.title.toLowerCase().indexOf(q) !== -1 || r.sub.toLowerCase().indexOf(q) !== -1) {
+      matches.push({r: r, idx: i});
+    }
+  }
+  var html = '<div class="so-section"><h4>' + matches.length + ' Result' + (matches.length !== 1 ? 's' : '') + '</h4>';
+  if (matches.length) {
+    for (var i = 0; i < matches.length; i++) {
+      html += '<div class="so-result" onclick="soClick(' + matches[i].idx + ')">' +
+        '<div class="sr-icon">' + matches[i].r.icon + '</div>' +
+        '<div><h5>' + matches[i].r.title + '</h5><p>' + matches[i].r.sub + '</p></div>' +
+        '<span class="sr-arr">→</span></div>';
+    }
+  } else {
+    html += '<p style="color:var(--muted);font-size:13px;padding:10px 0;">No results found.</p>';
+  }
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+// ═══ VOICE OVERLAY ═══
+function openVoiceOverlay() {
+  document.getElementById('voice-overlay').classList.add('open');
+  setTimeout(function() { var el = document.getElementById('vo-type'); if (el) el.focus(); }, 100);
+}
+function closeVoiceOverlay() {
+  document.getElementById('voice-overlay').classList.remove('open');
+  voOverlayOn = false;
+  var orb = document.getElementById('vo-orb');
+  if (orb) orb.classList.remove('on');
+  var wave = document.getElementById('vo-wave');
+  if (wave) wave.style.display = 'none';
+  var icon = document.getElementById('vo-icon');
+  if (icon) icon.textContent = '🎙️';
+  var status = document.getElementById('vo-status');
+  if (status) status.textContent = 'Tap orb to speak';
+}
+function voPickLang(el, code) {
+  var btns = document.querySelectorAll('.vo-lang-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('sel');
+  el.classList.add('sel');
+}
+function toggleVoiceOverlay() {
+  voOverlayOn = !voOverlayOn;
+  var orb = document.getElementById('vo-orb');
+  var wave = document.getElementById('vo-wave');
+  var status = document.getElementById('vo-status');
+  var icon = document.getElementById('vo-icon');
+  if (voOverlayOn) {
+    if (orb) orb.classList.add('on');
+    if (wave) wave.style.display = 'flex';
+    if (status) status.textContent = 'Listening...';
+    if (icon) icon.textContent = '🔴';
+    setTimeout(function() {
+      voOverlayOn = false;
+      if (orb) orb.classList.remove('on');
+      if (wave) wave.style.display = 'none';
+      if (icon) icon.textContent = '🤔';
+      if (status) status.textContent = 'Processing...';
+      setTimeout(function() {
+        if (icon) icon.textContent = '🎙️';
+        if (status) status.textContent = 'Tap orb to speak';
+        var vt = document.getElementById('vo-transcript');
+        if (vt) vt.innerHTML = '<span style="color:#F59E0B;font-size:11px;font-weight:700;">AI RESPONSE</span><br><span style="font-size:13px;line-height:1.8;white-space:pre-line;">' + VOICE_RESPONSES['malaria'].r + '</span>';
+      }, 1200);
+    }, 2500);
+  } else {
+    if (orb) orb.classList.remove('on');
+    if (wave) wave.style.display = 'none';
+    if (status) status.textContent = 'Tap orb to speak';
+    if (icon) icon.textContent = '🎙️';
+  }
+}
+function sendVoiceType() {
+  var inp = document.getElementById('vo-type');
+  if (!inp) return;
+  var val = inp.value.trim();
+  if (!val) return;
+  var keys = Object.keys(VOICE_RESPONSES);
+  var match = 'malaria';
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i];
+    if (val.toLowerCase().indexOf(k) !== -1 || VOICE_RESPONSES[k].q.toLowerCase().indexOf(val.toLowerCase()) !== -1) {
+      match = k;
+      break;
+    }
+  }
+  var vt = document.getElementById('vo-transcript');
+  if (vt) vt.innerHTML = '<span style="color:#F59E0B;font-size:11px;font-weight:700;">YOU</span><br><span style="font-size:13px;">' + val + '</span><br><br><span style="color:rgba(255,255,255,.5);font-size:11px;font-weight:700;">AI RESPONSE</span><br><span style="font-size:13px;line-height:1.8;white-space:pre-line;">' + VOICE_RESPONSES[match].r + '</span>';
+  inp.value = '';
+}
+
+// ═══ LOGIN & OTP ═══
+function submitLogin() {
+  var name  = document.getElementById('login-name').value.trim();
+  var phone = document.getElementById('login-phone').value.trim();
+  var lga   = document.getElementById('login-lga').value;
+  if (!name)  { showToast('⚠️ Please enter your name'); return; }
+  if (phone.length < 10) { showToast('⚠️ Enter a valid phone number (e.g. 08012345678)'); return; }
+  if (!lga)   { showToast('⚠️ Please select your LGA'); return; }
+  currentUser.name  = name;
+  currentUser.phone = phone;
+  currentUser.lga   = lga;
+  var parts = name.split(' ');
+  var initials = '';
+  for (var i = 0; i < parts.length && i < 2; i++) {
+    if (parts[i]) initials += parts[i][0].toUpperCase();
+  }
+  currentUser.initials = initials || 'U';
+  var pd = document.getElementById('otp-phone-display');
+  if (pd) pd.textContent = '📱 +234 ' + phone.slice(1,4) + ' ' + phone.slice(4,7) + ' ' + phone.slice(7);
+  goTo('otp-screen');
+  showToast('✅ Code sent to ' + phone);
+  setTimeout(function() { var el = document.getElementById('otp1'); if (el) el.focus(); }, 300);
+}
+
+function otpNext(el, nextId) {
+  el.value = el.value.replace(/[^0-9]/g, '');
+  if (el.value && nextId) {
+    var nx = document.getElementById(nextId);
+    if (nx) nx.focus();
+  }
+  var ids = ['otp1','otp2','otp3','otp4','otp5','otp6'];
+  var code = '';
+  for (var i = 0; i < ids.length; i++) {
+    var box = document.getElementById(ids[i]);
+    if (box) code += box.value;
+  }
+  if (code.length === 6) setTimeout(verifyOTP, 300);
+}
+
+function otpBack(e, el, prevId) {
+  if (e.key === 'Backspace' && !el.value && prevId) {
+    var pv = document.getElementById(prevId);
+    if (pv) pv.focus();
+  }
+}
+
+function verifyOTP() {
+  var ids = ['otp1','otp2','otp3','otp4','otp5','otp6'];
+  var code = '';
+  for (var i = 0; i < ids.length; i++) {
+    var box = document.getElementById(ids[i]);
+    if (box) code += box.value;
+  }
+  if (code.length < 6) { showToast('⚠️ Enter all 6 digits'); return; }
+  showToast('✅ Welcome to YobeCare!');
+  updateProfileDisplay();
+  goTo('home');
+}
+
+function resendOTP() {
+  var ids = ['otp1','otp2','otp3','otp4','otp5','otp6'];
+  for (var i = 0; i < ids.length; i++) {
+    var box = document.getElementById(ids[i]);
+    if (box) box.value = '';
+  }
+  var f = document.getElementById('otp1');
+  if (f) f.focus();
+  showToast('📱 New code sent!');
+}
+
+function updateProfileDisplay() {
+  var pa = document.getElementById('prof-avatar');
+  var pn = document.getElementById('prof-name-display');
+  var pp = document.getElementById('prof-phone-display');
+  var pl = document.getElementById('prof-lga-display');
+  var ha = document.getElementById('home-avatar');
+  var un = document.querySelector('.uname');
+  if (pa) pa.textContent = currentUser.initials;
+  if (pn) pn.textContent = currentUser.name;
+  if (pp) pp.textContent = '+234 ' + currentUser.phone.slice(1);
+  if (pl) pl.textContent = '📍 ' + currentUser.lga + ' LGA';
+  if (ha) ha.textContent = currentUser.initials;
+  if (un) un.textContent = currentUser.name;
+}
+
+function logOut() {
+  showToast('👋 Logged out. See you soon!');
+  var ids = ['otp1','otp2','otp3','otp4','otp5','otp6'];
+  for (var i = 0; i < ids.length; i++) {
+    var box = document.getElementById(ids[i]);
+    if (box) box.value = '';
+  }
+  var ln = document.getElementById('login-name');
+  var lp = document.getElementById('login-phone');
+  if (ln) ln.value = '';
+  if (lp) lp.value = '';
+  setTimeout(function() { goTo('splash'); }, 800);
+}
+
+function sendChat() {
+  var inp = document.getElementById('chat-in');
+  if (!inp || !inp.value.trim()) return;
+  showToast('💬 Sent: ' + inp.value.trim().substring(0, 30));
+  inp.value = '';
+}
+
+// ═══ TTS ═══
+function ttsGetVoice(langCode) {
+  var voices = window.speechSynthesis.getVoices();
+  var bcp = TTS_VOICE_MAP[langCode] || 'en-NG';
+  var base = bcp.split('-')[0];
+  var exact = null, partial = null, english = null;
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].lang === bcp) { exact = voices[i]; break; }
+    if (!partial && voices[i].lang.indexOf(base) === 0) partial = voices[i];
+    if (!english && voices[i].lang.indexOf('en') === 0) english = voices[i];
+  }
+  return exact || partial || english || (voices.length ? voices[0] : null);
+}
+
+function ttsSpeakText(text, langCode) {
+  if (!window.speechSynthesis) { showToast('❌ TTS not supported'); return; }
+  ttsStop();
+  ttsLang = langCode || ttsLang;
+  ttsUtterance = new SpeechSynthesisUtterance(text);
+  ttsUtterance.voice = ttsGetVoice(ttsLang);
+  ttsUtterance.rate = 0.88;
+  ttsUtterance.lang = TTS_VOICE_MAP[ttsLang] || 'en-NG';
+  var bar = document.getElementById('tts-bar');
+  var orb = document.getElementById('tts-orb');
+  var preview = document.getElementById('tts-preview');
+  if (preview) preview.textContent = text.slice(0, 60) + (text.length > 60 ? '...' : '');
+  if (bar) bar.classList.add('visible');
+  if (orb) { orb.classList.add('speaking'); orb.textContent = '🔴'; }
+  ttsSpeaking = true;
+  ttsUtterance.onend = function() {
+    ttsSpeaking = false;
+    if (orb) { orb.classList.remove('speaking'); orb.textContent = '🔊'; }
+    setTimeout(function() { if (bar) bar.classList.remove('visible'); }, 2500);
+    var rbs = document.querySelectorAll('.read-btn.speaking');
+    for (var i = 0; i < rbs.length; i++) {
+      rbs[i].classList.remove('speaking');
+      rbs[i].innerHTML = '🔊 Read Aloud';
+    }
+  };
+  ttsUtterance.onerror = function() { ttsStop(); };
+  window.speechSynthesis.speak(ttsUtterance);
+}
+
+function ttsStop() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  ttsSpeaking = false;
+  var bar = document.getElementById('tts-bar');
+  var orb = document.getElementById('tts-orb');
+  if (orb) { orb.classList.remove('speaking'); orb.textContent = '🔊'; }
+  setTimeout(function() { if (bar) bar.classList.remove('visible'); }, 800);
+  var rbs = document.querySelectorAll('.read-btn.speaking');
+  for (var i = 0; i < rbs.length; i++) {
+    rbs[i].classList.remove('speaking');
+    rbs[i].innerHTML = '🔊 Read Aloud';
+  }
+}
+
+function ttsToggle() { if (ttsSpeaking) ttsStop(); }
+
+// Screenshot block
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+document.addEventListener('keydown', function(e) {
+  var blocked = (e.key === 'PrintScreen') ||
+    (e.ctrlKey && (e.key === 'p' || e.key === 'P' || e.key === 's' || e.key === 'S')) ||
+    (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === 's' || e.key === 'S'));
+  if (blocked) { e.preventDefault(); showToast('📵 Screenshots are disabled in YobeCare'); }
+});
+document.addEventListener('selectstart', function(e) {
+  var tag = e.target.tagName;
+  if (tag !== 'INPUT' && tag !== 'TEXTAREA') e.preventDefault();
+});
+
+// Preload TTS voices
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+}
+
+// ═══ AI HEALTH Q&A ═══
+function prefillAI(text) {
+  var inp = document.getElementById('ai-q-input');
+  if (inp) { inp.value = text; inp.focus(); }
+}
+
+function appendAIMsg(text, isUser) {
+  var box = document.getElementById('ai-chat-box');
+  if (!box) return;
+  var div = document.createElement('div');
+  div.style.cssText = isUser
+    ? 'background:#e0f2fe;border-radius:10px;padding:10px 12px;font-size:13px;color:#0c4a6e;line-height:1.5;align-self:flex-end;max-width:90%;margin-left:auto;'
+    : 'background:#f0fdf4;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);line-height:1.5;border-left:3px solid var(--teal);';
+  div.textContent = (isUser ? '🙋 ' : '🤖 ') + text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function askHealthAI() {
+  var inp = document.getElementById('ai-q-input');
+  if (!inp) return;
+  var q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  appendAIMsg(q, true);
+
+  var thinking = document.createElement('div');
+  thinking.id = 'ai-thinking';
+  thinking.style.cssText = 'background:#f0fdf4;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted);border-left:3px solid var(--teal);';
+  thinking.textContent = '🤖 Thinking…';
+  var box = document.getElementById('ai-chat-box');
+  if (box) { box.appendChild(thinking); box.scrollTop = box.scrollHeight; }
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 400,
+      system: 'You are YobeCare Health AI, a medical assistant for Yobe State, Nigeria. You help residents understand disease symptoms, first aid steps, and when to go to hospital. Be concise (under 120 words), practical, and warm. If the question is in Hausa, respond in Hausa then English. Always end with: go to hospital if symptoms are severe. Never diagnose — always recommend seeing a doctor.',
+      messages: [{ role: 'user', content: q }]
+    })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    var th = document.getElementById('ai-thinking');
+    if (th) th.parentNode.removeChild(th);
+    var answer = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'Sorry, I could not get a response. Please try again.';
+    appendAIMsg(answer, false);
+  })
+  .catch(function() {
+    var th = document.getElementById('ai-thinking');
+    if (th) th.parentNode.removeChild(th);
+    appendAIMsg('Sorry, connection error. Please check your internet and try again.', false);
+  });
+}
+
+// Allow Enter key to submit AI question
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'ai-q-input') {
+    askHealthAI();
+  }
+});
+
+// ═══ INIT ═══
+buildDiseases();
+</script>
+</body>
+</html>
