@@ -1,4 +1,4 @@
-# 🏥 YobeCare + 🛡️ YobeAlert
+# 🏥 YobeCare + 🛡️ YobeAlert + YobeConnect
 ### Digital Solutions for Yobe State, Nigeria
 **3MTT Nigeria NextGen Knowledge Showcase 2026 · Powered by Airtel NextGen**
 
@@ -9,6 +9,7 @@
 |---|---|
 | 🛡️ YobeAlert|https://yobealert.netlify.app/ |
 | YobeCare|https://yobecare.netlify.app/|
+| YobeConnect | https://yobeconnect.netlify.app/
 
 ---
 
@@ -122,5 +123,44 @@ This project was built with assistance from:
  as part of the 3MTT Nigeria NextGen programme.*
 
 ---
+
+*Yobe State, this is for you. 🇳🇬*
+
+---
+
+## 📱 YobeConnect
+
+**Digital Literacy Platform for Yobe State, Nigeria**
+
+YobeConnect is a free mobile-first web app that teaches digital skills 
+to residents of Yobe State — from basic smartphone use to AI, coding, 
+business, and online safety. Built for the 3MTT NextGen Knowledge 
+Showcase 2026.
+
+### 🎯 Problem
+Over 70% of Yobe State residents lack basic digital literacy skills, 
+limiting access to jobs, government services, and economic opportunity.
+
+### ✅ Features
+- 📚 25 lessons across 5 categories (Basics, Internet, Safety, AI & Tech, Business)
+- 🧠 Interactive quiz with points and leaderboard
+- 🚨 Scam Reporter — report digital scams by LGA
+- 📋 Yobe Resource Directory — hospitals, schools, banks across 17 LGAs
+- 🎓 Free Training Programs — 3MTT, Google, Coursera, freeCodeCamp & more
+- 👥 Community feed by LGA
+- 🏅 Achievements, streaks, and downloadable certificate
+- 📶 Works offline
+- 🔐 Account system — progress saved on device
+
+### 🛠️ Built With
+- HTML, CSS, JavaScript (single file, no framework)
+- Supabase (authentication)
+- localStorage (offline-first data)
+
+### 🌍 Impact
+- Serves all **17 LGAs** of Yobe State
+- Works on **any phone**, no app download needed
+- **100% free** — no data charges beyond page load
+- Supports **3MTT Digital Inclusion** pillar
 
 *Yobe State, this is for you. 🇳🇬*
