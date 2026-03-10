@@ -23,7 +23,7 @@
 ---
 
 ## 🎯 Challenge Pillar
-**Digital / Enviroment Inclusion + Health Access + Security Reort**
+**Digital / Enviroment / Education Inclusion + Health Access + Security Report**
 
 ---
 
