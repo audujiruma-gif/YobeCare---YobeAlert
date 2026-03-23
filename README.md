@@ -2,6 +2,7 @@
 ### Digital Solutions for Yobe State, Nigeria
 **3MTT Nigeria NextGen Knowledge Showcase 2026 · Powered by Airtel NextGen**
 
+link to one page solution brief : https://docs.google.com/document/d/1JDzWzUeM1ooMRkvgV01_dSuxKghhD937/edit?usp=drivesdk&ouid=107738456846383850975&rtpof=true&sd=true
 ---
 
 ## 🔗 Live Demos
